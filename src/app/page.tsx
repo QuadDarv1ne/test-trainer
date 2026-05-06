@@ -10,30 +10,14 @@ import { tasks } from "@/lib/tasks";
 import type { Task, TestCaseCategory } from "@/lib/tasks";
 import type { TestCase, EvaluationResult } from "@/lib/evaluator";
 import { evaluateTestCases } from "@/lib/evaluator";
-import {
-  saveProgress,
-  loadProgress,
-  saveCurrentSession,
-  loadCurrentSession,
-  type TaskProgress,
-} from "@/lib/storage";
+import { saveProgress, loadProgress, saveCurrentSession, loadCurrentSession, type TaskProgress, } from "@/lib/storage";
 import { TaskCard } from "@/components/task-card";
 import { TaskWorkspace } from "@/components/task-workspace";
 import { TestForm } from "@/components/test-form";
 import { TestList } from "@/components/test-list";
 import { ResultsPanel } from "@/components/results-panel";
 import { TheoryPanel } from "@/components/theory-panel";
-import {
-  Beaker,
-  ListChecks,
-  Dumbbell,
-  BarChart3,
-  BookOpen,
-  ArrowLeft,
-  Sun,
-  Moon,
-  Trophy,
-} from "lucide-react";
+import { Beaker, ListChecks, Dumbbell, BarChart3, BookOpen, ArrowLeft, Sun, Moon, Trophy, } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const TOTAL_TASKS = 6;
@@ -49,7 +33,6 @@ let nextTestCaseId = 1;
 function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const isDark = theme === "dark";
-
   return (
     <Button
       variant="ghost"
@@ -67,8 +50,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("tasks");
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [testCases, setTestCases] = useState<TestCase[]>([]);
-  const [evaluationResult, setEvaluationResult] =
-    useState<EvaluationResult | null>(null);
+  const [evaluationResult, setEvaluationResult] = useState<EvaluationResult | null>(null);
   const [savedProgress, setSavedProgress] = useState<Record<number, TaskProgress>>({});
 
   // Load saved progress on mount
@@ -80,30 +62,21 @@ export default function Home() {
     return Object.keys(savedProgress).length;
   }, [savedProgress]);
 
-  const handleSelectTask = useCallback(
-    (task: Task) => {
-      setSelectedTask(task);
-      setEvaluationResult(null);
-      setActiveTab("trainer");
-
-      // Load saved session for this task
-      const savedSession = loadCurrentSession(task.id);
-      if (savedSession && savedSession.length > 0) {
-        setTestCases(savedSession);
-      } else {
-        setTestCases([]);
-      }
-    },
-    []
-  );
+  const handleSelectTask = useCallback((task: Task) => {
+    setSelectedTask(task);
+    setEvaluationResult(null);
+    setActiveTab("trainer");
+    // Load saved session for this task
+    const savedSession = loadCurrentSession(task.id);
+    if (savedSession && savedSession.length > 0) {
+      setTestCases(savedSession);
+    } else {
+      setTestCases([]);
+    }
+  }, []);
 
   const handleAddTestCase = useCallback(
-    (
-      inputs: string[],
-      expected: string,
-      category: TestCaseCategory,
-      comment: string
-    ) => {
+    (inputs: string[], expected: string, category: TestCaseCategory, comment: string) => {
       const newCase: TestCase = {
         id: `tc-${nextTestCaseId++}`,
         inputs,
@@ -144,11 +117,9 @@ export default function Home() {
     const result = evaluateTestCases(selectedTask, testCases);
     setEvaluationResult(result);
     setActiveTab("results");
-
     // Save best progress
     saveProgress(selectedTask.id, result.overallScore, testCases);
     setSavedProgress(loadProgress());
-
     toast.success(`Проверка завершена! Оценка: ${result.overallScore}%`);
   }, [selectedTask, testCases]);
 
@@ -187,9 +158,7 @@ export default function Home() {
                 <Beaker className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
-                  Тренажёр тестирования
-                </h1>
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Тренажёр тестирования</h1>
                 <p className="text-xs sm:text-sm text-muted-foreground">
                   Генератор тест-кейсов • Методы чёрного ящика
                 </p>
@@ -208,7 +177,8 @@ export default function Home() {
             <div className="flex items-center gap-2 text-sm">
               <Trophy className="h-4 w-4 text-emerald-600" />
               <span className="font-medium">
-                Выполнено: {completedCount} из {TOTAL_TASKS} заданий
+                {" "}
+                Выполнено: {completedCount} из {TOTAL_TASKS} заданий{" "}
               </span>
             </div>
             <span className="text-xs text-muted-foreground">
@@ -224,8 +194,8 @@ export default function Home() {
                   completedCount >= 5
                     ? "linear-gradient(to right, #10b981, #059669)"
                     : completedCount >= 3
-                      ? "linear-gradient(to right, #f59e0b, #10b981)"
-                      : "linear-gradient(to right, #ef4444, #f59e0b)",
+                    ? "linear-gradient(to right, #f59e0b, #10b981)"
+                    : "linear-gradient(to right, #ef4444, #f59e0b)",
               }}
             />
           </div>
@@ -288,23 +258,13 @@ export default function Home() {
 
           <AnimatePresence mode="wait">
             {/* Tasks tab */}
-            <TabsContent value="tasks" forceMount>
+            <TabsContent key="tasks-content" value="tasks" forceMount>
               {activeTab === "tasks" && (
-                <motion.div
-                  key="tasks"
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                >
+                <motion.div key="tasks" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
                   <div className="mb-4 sm:mb-6">
-                    <h2 className="text-lg sm:text-xl font-semibold mb-1">
-                      Выберите задание
-                    </h2>
+                    <h2 className="text-lg sm:text-xl font-semibold mb-1">Выберите задание</h2>
                     <p className="text-sm text-muted-foreground">
-                      Выберите функцию для тестирования. Каждое задание содержит
-                      описание, классы эквивалентности и граничные значения.
+                      Выберите функцию для тестирования. Каждое задание содержит описание, классы эквивалентности и граничные значения.
                     </p>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
@@ -323,29 +283,15 @@ export default function Home() {
             </TabsContent>
 
             {/* Trainer tab */}
-            <TabsContent value="trainer" forceMount>
+            <TabsContent key="trainer-content" value="trainer" forceMount>
               {activeTab === "trainer" && selectedTask && (
-                <motion.div
-                  key="trainer"
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                >
+                <motion.div key="trainer" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
                   <div className="flex items-center gap-2 mb-4 sm:mb-6">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleBackToTasks}
-                      className="text-muted-foreground"
-                    >
+                    <Button variant="ghost" size="sm" onClick={handleBackToTasks} className="text-muted-foreground">
                       <ArrowLeft className="h-4 w-4 mr-1" />
                       Назад
                     </Button>
-                    <h2 className="text-lg sm:text-xl font-semibold">
-                      Тренажёр: {selectedTask.name}
-                    </h2>
+                    <h2 className="text-lg sm:text-xl font-semibold">Тренажёр: {selectedTask.name}</h2>
                   </div>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                     {/* Left panel - task description */}
@@ -354,15 +300,8 @@ export default function Home() {
                     </div>
                     {/* Right panel - test form and list */}
                     <div className="space-y-4">
-                      <TestForm
-                        task={selectedTask}
-                        onAdd={handleAddTestCase}
-                      />
-                      <TestList
-                        testCases={testCases}
-                        onRemove={handleRemoveTestCase}
-                        onSubmit={handleSubmit}
-                      />
+                      <TestForm task={selectedTask} onAdd={handleAddTestCase} />
+                      <TestList testCases={testCases} onRemove={handleRemoveTestCase} onSubmit={handleSubmit} />
                     </div>
                   </div>
                 </motion.div>
@@ -370,52 +309,30 @@ export default function Home() {
             </TabsContent>
 
             {/* Results tab */}
-            <TabsContent value="results" forceMount>
+            <TabsContent key="results-content" value="results" forceMount>
               {activeTab === "results" && (
-                <motion.div
-                  key="results"
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                >
+                <motion.div key="results" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
                   <div className="mb-4 sm:mb-6">
-                    <h2 className="text-lg sm:text-xl font-semibold mb-1">
-                      Результаты проверки
-                    </h2>
+                    <h2 className="text-lg sm:text-xl font-semibold mb-1">Результаты проверки</h2>
                     <p className="text-sm text-muted-foreground">
                       Подробная оценка ваших тест-кейсов с покрытием и рекомендациями.
                     </p>
                   </div>
                   <div className="max-w-4xl mx-auto">
-                    <ResultsPanel
-                      result={evaluationResult}
-                      onReset={handleReset}
-                    />
+                    <ResultsPanel result={evaluationResult} onReset={handleReset} />
                   </div>
                 </motion.div>
               )}
             </TabsContent>
 
             {/* Theory tab */}
-            <TabsContent value="theory" forceMount>
+            <TabsContent key="theory-content" value="theory" forceMount>
               {activeTab === "theory" && (
-                <motion.div
-                  key="theory"
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                >
+                <motion.div key="theory" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
                   <div className="mb-4 sm:mb-6">
-                    <h2 className="text-lg sm:text-xl font-semibold mb-1">
-                      Теория тестирования
-                    </h2>
+                    <h2 className="text-lg sm:text-xl font-semibold mb-1">Теория тестирования</h2>
                     <p className="text-sm text-muted-foreground">
-                      Изучите основные методы тестирования «чёрного ящика»
-                      перед выполнением заданий.
+                      Изучите основные методы тестирования «чёрного ящика» перед выполнением заданий.
                     </p>
                   </div>
                   <div className="max-w-3xl mx-auto">
