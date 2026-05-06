@@ -17,6 +17,8 @@ import { TestForm } from "@/components/test-form";
 import { TestList } from "@/components/test-list";
 import { ResultsPanel } from "@/components/results-panel";
 import { TheoryPanel } from "@/components/theory-panel";
+import { StatisticsPanel } from "@/components/statistics-panel";
+import { AchievementsPanel } from "@/components/achievements-panel";
 import { Beaker, ListChecks, Dumbbell, BarChart3, BookOpen, ArrowLeft, Sun, Moon, Trophy, } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -219,7 +221,7 @@ export default function Home() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 mb-4 sm:mb-6 h-auto p-1 bg-muted/50">
+          <TabsList className="grid w-full grid-cols-6 mb-4 sm:mb-6 h-auto p-1 bg-muted/50">
             <TabsTrigger
               value="tasks"
               className="text-xs sm:text-sm py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white"
@@ -253,6 +255,22 @@ export default function Home() {
               <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
               <span className="hidden xs:inline sm:inline">Теория</span>
               <span className="xs:hidden sm:hidden">Т</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="statistics"
+              className="text-xs sm:text-sm py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white"
+            >
+              <BarChart3 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span className="hidden xs:inline sm:inline">Статистика</span>
+              <span className="hidden sm:inline">С</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="achievements"
+              className="text-xs sm:text-sm py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white"
+            >
+              <Trophy className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span className="hidden xs:inline sm:inline">Достижения</span>
+              <span className="hidden sm:hidden">Д</span>
             </TabsTrigger>
           </TabsList>
 
@@ -338,6 +356,24 @@ export default function Home() {
                   <div className="max-w-3xl mx-auto">
                     <TheoryPanel />
                   </div>
+                </motion.div>
+              )}
+            </TabsContent>
+
+            {/* Statistics tab */}
+            <TabsContent key="statistics-content" value="statistics" forceMount>
+              {activeTab === "statistics" && (
+                <motion.div key="statistics" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
+                  <StatisticsPanel />
+                </motion.div>
+              )}
+            </TabsContent>
+
+            {/* Achievements tab */}
+            <TabsContent key="achievements-content" value="achievements" forceMount>
+              {activeTab === "achievements" && (
+                <motion.div key="achievements" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
+                  <AchievementsPanel />
                 </motion.div>
               )}
             </TabsContent>
