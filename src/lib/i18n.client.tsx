@@ -1,12 +1,6 @@
 "use client";
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  type ReactNode,
-} from "react";
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import { translations } from "@/lib/translations";
 
 export type Locale = "ru" | "en";
@@ -25,7 +19,9 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const saved = localStorage.getItem("test-trainer-locale") as Locale | null;
     if (saved && (saved === "en" || saved === "ru")) {
-      setLocaleState(saved);
+      requestAnimationFrame(() => {
+        setLocaleState(saved);
+      });
     }
   }, []);
 

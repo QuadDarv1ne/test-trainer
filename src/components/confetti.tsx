@@ -31,7 +31,9 @@ export function Confetti({ active }: { active: boolean }) {
 
   useEffect(() => {
     if (!active) {
-      setParticles([]);
+      requestAnimationFrame(() => {
+        setParticles([]);
+      });
       return;
     }
 
@@ -48,7 +50,9 @@ export function Confetti({ active }: { active: boolean }) {
       isCircle: Math.random() > 0.5,
     }));
 
-    setParticles(newParticles);
+    requestAnimationFrame(() => {
+      setParticles(newParticles);
+    });
 
     const interval = setInterval(() => {
       setParticles((prev) =>
@@ -66,7 +70,9 @@ export function Confetti({ active }: { active: boolean }) {
 
     const timeout = setTimeout(() => {
       clearInterval(interval);
-      setParticles([]);
+      requestAnimationFrame(() => {
+        setParticles([]);
+      });
     }, 3000);
 
     return () => {

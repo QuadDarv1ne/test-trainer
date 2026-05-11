@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -66,7 +65,7 @@ export function TestForm({ task, onAdd }: TestFormProps) {
     comment: z.string().optional(),
   }), [task.params.length]);
 
-  const defaultInputs = useMemo(() => task.params.map(() => ""), [task.params.length]);
+  const defaultInputs = useMemo(() => task.params.map(() => ""), [task.params]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
