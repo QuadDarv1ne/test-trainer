@@ -1,5 +1,7 @@
 "use client";
 
+import { toast } from "sonner";
+
 export interface Achievement {
   id: string;
   name: string;
@@ -123,8 +125,10 @@ export function loadUnlockedAchievements(): string[] {
 export function saveUnlockedAchievements(ids: string[]): void {
   try {
     localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(ids));
-  } catch {
-    // ignore
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "QuotaExceededError") {
+      toast.error("Хранилище браузера заполнено. Очистите данные сайта.");
+    }
   }
 }
 

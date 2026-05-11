@@ -2,10 +2,22 @@
 
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Flame } from "lucide-react";
+import { Flame, Trash2 } from "lucide-react";
 import { tasks } from "@/lib/tasks";
 import type { AttemptRecord, StreakData } from "@/lib/storage";
-import { loadStreak, loadAttempts } from "@/lib/storage";
+import { loadStreak, loadAttempts, clearAllProgress } from "@/lib/storage";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export function StatisticsPanel() {
   const [streak] = useState<StreakData>(() => loadStreak());
@@ -20,6 +32,13 @@ export function StatisticsPanel() {
     const p = progress[t.id];
     return p && p.score >= 90;
   }).length;
+
+  const handleReset = () => {
+    clearAllProgress();
+    toast.success("Прогресс сброшен");
+    // Reload page to refresh state
+    window.location.reload();
+  };
 
   return (
     <div className="space-y-4">
@@ -63,6 +82,31 @@ export function StatisticsPanel() {
           </p>
           <p className="text-xs text-muted-foreground">Отлично</p>
         </div>
+      </div>
+
+      {/* Reset progress */}
+      <div className="flex justify-center pt-2">
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <button className="text-xs text-muted-foreground hover:text-destructive flex items-center gap-1 transition-colors">
+              <Trash2 className="h-3 w-3" />
+              Сбросить прогресс
+            </button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Сбросить весь прогресс?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Это действие удалит все ваши результаты, статистику и достижения.
+                Действие нельзя отменить.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Отмена</AlertDialogCancel>
+              <AlertDialogAction onClick={handleReset}>Сбросить</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
