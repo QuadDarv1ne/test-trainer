@@ -13,6 +13,7 @@ import { ResultsTab } from "@/components/results-tab";
 import { TheoryTab } from "@/components/theory-tab";
 import { StatisticsPanel } from "@/components/statistics-panel";
 import { AchievementsPanel } from "@/components/achievements-panel";
+import { ExamMode } from "@/components/exam-mode";
 import { AppFooter } from "@/components/app-footer";
 
 export default function Home() {
@@ -83,6 +84,9 @@ export default function Home() {
             </TabsContent>
             <TabsContent key="achievements" value="achievements">
               <AchievementsPanel />
+            </TabsContent>
+            <TabsContent key="exam" value="exam">
+              <ExamMode />
             </TabsContent>
           </AnimatePresence>
         </Tabs>

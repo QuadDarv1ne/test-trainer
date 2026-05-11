@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -59,14 +59,14 @@ interface TestFormProps {
 export function TestForm({ task, onAdd }: TestFormProps) {
   const { t } = useLocale();
 
-  const formSchema = z.object({
+  const formSchema = useMemo(() => z.object({
     inputs: z.array(z.string().min(1, "Поле обязательно")).length(task.params.length),
     expected: z.string().min(1, "Ожидаемый результат обязателен"),
     category: z.enum(["Нормальное значение", "Граничное значение", "Исключение", "Недопустимый тип"] as const),
     comment: z.string().optional(),
-  });
+  }), [task.params.length]);
 
-  const defaultInputs = task.params.map(() => "");
+  const defaultInputs = useMemo(() => task.params.map(() => ""), [task.params.length]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

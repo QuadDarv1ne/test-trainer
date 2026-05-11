@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,7 @@ export function TaskWorkspace({ task, testCasesCount = 0 }: TaskWorkspaceProps) 
   const [hintIndex, setHintIndex] = useState(0);
 
   // Generate hints from uncovered ECs and BVs
-  const allHints = [
+  const allHints = useMemo(() => [
     ...task.equivalenceClasses.map((ec) => ({
       type: "ec" as const,
       text: `${t("trainer_hint")}: ${ec.name} — ${ec.description}. ${t("form_placeholder_number").split(":")[1] || ""} ${JSON.stringify(ec.exampleValues[0])}`,
@@ -39,7 +39,7 @@ export function TaskWorkspace({ task, testCasesCount = 0 }: TaskWorkspaceProps) 
       type: "bv" as const,
       text: `${t("trainer_hint")}: ${Array.isArray(bv.value) ? `[${bv.value.join(", ")}]` : bv.value} — ${bv.description}`,
     })),
-  ];
+  ], [task, t]);
 
   const showHint = testCasesCount > 0 && hintIndex < allHints.length;
   return (

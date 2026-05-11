@@ -5,12 +5,7 @@ import { TabsContent } from "@/components/ui/tabs";
 import { useAppStore } from "@/lib/store";
 import { useLocale } from "@/lib/i18n.client";
 import { ResultsPanel } from "@/components/results-panel";
-
-const pageVariants = {
-  initial: { opacity: 0, x: 20 },
-  animate: { opacity: 1, x: 0 },
-  exit: { opacity: 0, x: -20 },
-};
+import { pageVariants } from "@/lib/animations";
 
 export function ResultsTab() {
   const { t } = useLocale();

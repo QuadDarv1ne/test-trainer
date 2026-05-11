@@ -6,8 +6,6 @@ import { useLocale } from "@/lib/i18n.client";
 import { tasks } from "@/lib/tasks";
 import { Trophy } from "lucide-react";
 
-const TOTAL_TASKS = 6;
-
 export function ProgressBar() {
   const { t } = useLocale();
   const savedProgress = useAppStore((s) => s.savedProgress);
@@ -16,28 +14,30 @@ export function ProgressBar() {
     return Object.keys(savedProgress).length;
   }, [savedProgress]);
 
+  const totalTasks = tasks.length;
+
   return (
     <div className="mb-4 sm:mb-6">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2 text-sm">
           <Trophy className="h-4 w-4 text-emerald-600" />
           <span className="font-medium">
-            {t("progress_completed")}: {completedCount} {t("progress_of")} {TOTAL_TASKS}
+            {t("progress_completed")}: {completedCount} {t("progress_of")} {totalTasks}
           </span>
         </div>
         <span className="text-xs text-muted-foreground">
-          {Math.round((completedCount / TOTAL_TASKS) * 100)}%
+          {Math.round((completedCount / totalTasks) * 100)}%
         </span>
       </div>
       <div className="h-2 rounded-full bg-muted overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-500 ease-out"
           style={{
-            width: `${(completedCount / TOTAL_TASKS) * 100}%`,
+            width: `${(completedCount / totalTasks) * 100}%`,
             background:
-              completedCount >= 5
+              completedCount >= totalTasks - 1
                 ? "linear-gradient(to right, #10b981, #059669)"
-                : completedCount >= 3
+                : completedCount >= Math.floor(totalTasks / 2)
                   ? "linear-gradient(to right, #f59e0b, #10b981)"
                   : "linear-gradient(to right, #ef4444, #f59e0b)",
           }}

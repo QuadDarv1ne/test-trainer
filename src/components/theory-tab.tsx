@@ -4,12 +4,7 @@ import { motion } from "framer-motion";
 import { TabsContent } from "@/components/ui/tabs";
 import { useLocale } from "@/lib/i18n.client";
 import { TheoryPanel } from "@/components/theory-panel";
-
-const pageVariants = {
-  initial: { opacity: 0, x: 20 },
-  animate: { opacity: 1, x: 0 },
-  exit: { opacity: 0, x: -20 },
-};
+import { pageVariants } from "@/lib/animations";
 
 export function TheoryTab() {
   const { t } = useLocale();

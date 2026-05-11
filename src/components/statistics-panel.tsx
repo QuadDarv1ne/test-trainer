@@ -40,17 +40,15 @@ export function StatisticsPanel() {
     ? Math.round(attempts.reduce((s, a) => s + a.score, 0) / totalAttempts)
     : 0;
 
-  const completedWithExcellent = tasks.filter((t) => {
-    const progress = loadProgress();
-    const p = progress[t.id];
+  const progress = loadProgress();
+  const completedWithExcellent = tasks.filter((task) => {
+    const p = progress[task.id];
     return p && p.score >= 90;
   }).length;
 
   const handleReset = () => {
     useAppStore.getState().clearAllProgress();
     toast.success(t("toast_progress_reset"));
-    // Reload page to refresh state
-    window.location.reload();
   };
 
   const dateLocale = locale === "ru" ? ru : enUS;

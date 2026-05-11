@@ -43,6 +43,15 @@ export const translations: Record<Locale, Record<string, string>> = {
     difficulty_medium: "Средне",
     difficulty_hard: "Сложно",
 
+    // Topics
+    topic_ec: "Классы эквивалентности",
+    topic_bv: "Граничные значения",
+    topic_nonlinear: "Нелинейные классы",
+    topic_multi: "Многофакторное тестирование",
+    topic_logic: "Логические условия",
+    topic_combinatorial: "Комбинаторное тестирование",
+    topic_formats: "Проверка форматов",
+
     // Trainer
     trainer_back: "Назад",
     trainer_best: "Лучший",
@@ -152,6 +161,13 @@ export const translations: Record<Locale, Record<string, string>> = {
     stats_reset_desc: "Это действие удалит все ваши результаты, статистику и достижения. Действие нельзя отменить.",
     stats_reset_cancel: "Отмена",
     stats_reset_confirm: "Сбросить",
+
+    // Keyboard shortcuts
+    shortcuts_title: "Горячие клавиши",
+    shortcuts_desc: "Быстрые комбинации для работы с тренажёром",
+    shortcuts_check: "Проверить тест-кейсы",
+    shortcuts_undo: "Удалить последний тест-кейс",
+    shortcuts_reset: "Сбросить сессию",
 
     // Achievements
     achievements_title: "Достижения",
@@ -299,6 +315,15 @@ export const translations: Record<Locale, Record<string, string>> = {
     difficulty_medium: "Medium",
     difficulty_hard: "Hard",
 
+    // Topics
+    topic_ec: "Equivalence Classes",
+    topic_bv: "Boundary Values",
+    topic_nonlinear: "Nonlinear Classes",
+    topic_multi: "Multi-factor Testing",
+    topic_logic: "Logical Conditions",
+    topic_combinatorial: "Combinatorial Testing",
+    topic_formats: "Format Validation",
+
     // Trainer
     trainer_back: "Back",
     trainer_best: "Best",
@@ -408,6 +433,13 @@ export const translations: Record<Locale, Record<string, string>> = {
     stats_reset_desc: "This will delete all your results, statistics, and achievements. This action cannot be undone.",
     stats_reset_cancel: "Cancel",
     stats_reset_confirm: "Reset",
+
+    // Keyboard shortcuts
+    shortcuts_title: "Keyboard Shortcuts",
+    shortcuts_desc: "Quick combinations for working with the trainer",
+    shortcuts_check: "Check test cases",
+    shortcuts_undo: "Remove last test case",
+    shortcuts_reset: "Reset session",
 
     // Achievements
     achievements_title: "Achievements",

@@ -12,12 +12,7 @@ import { TaskWorkspace } from "@/components/task-workspace";
 import { TestForm } from "@/components/test-form";
 import { TestList } from "@/components/test-list";
 import { ArrowLeft } from "lucide-react";
-
-const pageVariants = {
-  initial: { opacity: 0, x: 20 },
-  animate: { opacity: 1, x: 0 },
-  exit: { opacity: 0, x: -20 },
-};
+import { pageVariants } from "@/lib/animations";
 
 export function TrainerTab() {
   const { t } = useLocale();

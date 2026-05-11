@@ -3,7 +3,7 @@
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAppStore } from "@/lib/store";
 import { useLocale } from "@/lib/i18n.client";
-import { ListChecks, Dumbbell, BarChart3, BookOpen, Trophy } from "lucide-react";
+import { ListChecks, Dumbbell, BarChart3, BookOpen, Trophy, Timer } from "lucide-react";
 
 export function TabNavigation() {
   const { t } = useLocale();
@@ -61,6 +61,14 @@ export function TabNavigation() {
         <Trophy className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
         <span className="hidden sm:inline">{t("tab_achievements")}</span>
         <span className="sm:hidden">{t("tab_achievements_short")}</span>
+      </TabsTrigger>
+      <TabsTrigger
+        value="exam"
+        className="text-xs sm:text-sm py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white"
+      >
+        <Timer className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+        <span className="hidden sm:inline">{t("tab_exam")}</span>
+        <span className="sm:hidden">{t("tab_exam")}</span>
       </TabsTrigger>
     </TabsList>
   );

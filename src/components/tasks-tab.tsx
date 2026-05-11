@@ -6,12 +6,7 @@ import { useAppStore } from "@/lib/store";
 import { useLocale } from "@/lib/i18n.client";
 import { tasks } from "@/lib/tasks";
 import { TaskCard } from "@/components/task-card";
-
-const pageVariants = {
-  initial: { opacity: 0, x: 20 },
-  animate: { opacity: 1, x: 0 },
-  exit: { opacity: 0, x: -20 },
-};
+import { pageVariants } from "@/lib/animations";
 
 export function TasksTab() {
   const { t } = useLocale();
