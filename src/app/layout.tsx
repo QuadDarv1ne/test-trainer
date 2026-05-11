@@ -22,6 +22,11 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.svg",
   },
+  openGraph: {
+    title: "Тренажёр тестирования",
+    description: "Интерактивный тренажёр для изучения методов чёрного ящика",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
