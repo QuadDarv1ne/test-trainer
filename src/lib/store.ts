@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { Task } from "@/lib/tasks";
 import type { TestCase, EvaluationResult } from "@/lib/evaluator";
+import { evaluateTestCases } from "@/lib/evaluator";
 import { saveCurrentSession, loadCurrentSession, saveProgress as saveProgressToStorage, loadProgress as loadProgressFromStorage, saveAttempt, loadAttempts, getTaskHistory, loadStreak, saveStreak, clearAllProgress, type TaskProgress as StorageTaskProgress, type AttemptRecord, type StreakData } from "@/lib/storage";
 
 export type { TaskProgress as StorageTaskProgress, AttemptRecord, StreakData } from "@/lib/storage";
@@ -24,6 +25,7 @@ interface AppState {
   // Evaluation
   evaluationResult: EvaluationResult | null;
   setEvaluationResult: (result: EvaluationResult | null) => void;
+  submitTestCases: () => EvaluationResult | null;
 
   // Progress persistence
   savedProgress: Record<number, StorageTaskProgress>;
@@ -96,6 +98,15 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   evaluationResult: null,
   setEvaluationResult: (result) => set({ evaluationResult: result }),
+  submitTestCases: () => {
+    const state = get();
+    if (!state.selectedTask || state.testCases.length === 0) return null;
+    const result = evaluateTestCases(state.selectedTask, state.testCases);
+    set({ evaluationResult: result });
+    saveProgressToStorage(state.selectedTask.id, result.overallScore, state.testCases);
+    set({ savedProgress: loadProgressFromStorage() });
+    return result;
+  },
 
   savedProgress: {},
   updateProgress: (taskId, score, testCases) => {
