@@ -51,6 +51,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     topic_logic: "Логические условия",
     topic_combinatorial: "Комбинаторное тестирование",
     topic_formats: "Проверка форматов",
+    topic_decision_tables: "Таблицы решений",
 
     // Trainer
     trainer_back: "Назад",
@@ -402,6 +403,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     topic_logic: "Logical Conditions",
     topic_combinatorial: "Combinatorial Testing",
     topic_formats: "Format Validation",
+    topic_decision_tables: "Decision Tables",
 
     // Trainer
     trainer_back: "Back",

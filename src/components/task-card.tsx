@@ -140,7 +140,9 @@ export function TaskCard({ task, isSelected: isSelectedProp, bestScore, onClick 
                             ? t("topic_combinatorial")
                             : topic === "Проверка форматов"
                               ? t("topic_formats")
-                              : topic;
+                              : topic === "Таблицы решений"
+                                ? t("topic_decision_tables")
+                                : topic;
               return (
                 <Badge
                   key={topic}

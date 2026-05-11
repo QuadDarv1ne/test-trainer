@@ -176,6 +176,52 @@ function validateEmail(email: string): { valid: boolean; reason?: string } {
   return { valid: true };
 }
 
+function passwordStrength(password: string): number {
+  if (typeof password !== "string") throw new Error("Пароль должен быть строкой");
+  if (password.length === 0) return 0;
+  if (password.length > 128) throw new Error("Пароль слишком длинный (макс. 128 символов)");
+  let score = 0;
+  if (password.length >= 12) score = 60;
+  else if (password.length >= 8) score = 40;
+  else if (password.length >= 4) score = 20;
+  if (/[A-ZА-ЯЁ]/.test(password)) score += 10;
+  if (/[a-zа-яё]/.test(password)) score += 10;
+  if (/[0-9]/.test(password)) score += 10;
+  if (/[^a-zA-Zа-яА-ЯёЁ0-9]/.test(password)) score += 10;
+  return Math.min(score, 100);
+}
+
+function calculateShipping(weight: number, distance: number): number {
+  if (typeof weight !== "number" || typeof distance !== "number" || isNaN(weight) || isNaN(distance))
+    throw new Error("Аргументы должны быть числами");
+  if (weight <= 0) throw new Error("Вес должен быть положительным");
+  if (distance <= 0) throw new Error("Расстояние должно быть положительным");
+  if (weight > 100) throw new Error("Вес не может превышать 100 кг");
+  if (distance > 5000) throw new Error("Расстояние не может превышать 5000 км");
+  let baseCost: number;
+  if (weight <= 1) baseCost = 100;
+  else if (weight <= 5) baseCost = 100 + (weight - 1) * 50;
+  else if (weight <= 20) baseCost = 300 + (weight - 5) * 30;
+  else baseCost = 750 + (weight - 20) * 20;
+  let distanceMultiplier: number;
+  if (distance <= 10) distanceMultiplier = 1.0;
+  else if (distance <= 50) distanceMultiplier = 1.5;
+  else distanceMultiplier = 2.0;
+  return Math.round(baseCost * distanceMultiplier * 100) / 100;
+}
+
+function validatePhone(phone: string): { valid: boolean; reason?: string } {
+  if (typeof phone !== "string") throw new Error("Номер должен быть строкой");
+  if (phone.length === 0) return { valid: false, reason: "Пустая строка" };
+  if (!phone.startsWith("+")) return { valid: false, reason: "Номер должен начинаться с +" };
+  const digits = phone.replace(/[\s\-()]/g, "");
+  if (!/^\+\d+$/.test(digits)) return { valid: false, reason: "Разрешены только цифры, пробелы, дефисы и скобки" };
+  const digitCount = digits.length - 1;
+  if (digitCount < 7) return { valid: false, reason: "Слишком короткий номер (мин. 7 цифр)" };
+  if (digitCount > 15) return { valid: false, reason: "Слишком длинный номер (макс. 15 цифр)" };
+  return { valid: true };
+}
+
 // Map of reference functions
 export const referenceFunctions: Record<
   number,
@@ -191,6 +237,9 @@ export const referenceFunctions: Record<
   8: (args: unknown[]) => validateDate(args[0] as number, args[1] as number, args[2] as number),
   9: (args: unknown[]) => sortAndFilter(args[0] as number[]),
   10: (args: unknown[]) => validateEmail(args[0] as string),
+  11: (args: unknown[]) => passwordStrength(args[0] as string),
+  12: (args: unknown[]) => calculateShipping(args[0] as number, args[1] as number),
+  13: (args: unknown[]) => validatePhone(args[0] as string),
 };
 
 export const tasks: Task[] = [
@@ -1024,6 +1073,155 @@ export const tasks: Task[] = [
       { value: "@domain.com", description: "Пустая локальная часть" },
       { value: "user@domain", description: "Без точки в домене" },
       { value: "user@domain.c", description: "TLD из 1 символа" },
+    ],
+  },
+  {
+    id: 11,
+    name: "Калькулятор силы пароля",
+    difficulty: "Средне",
+    description:
+      "Оценивает **силу пароля** по шкале от 0 до 100. Учитывает длину, разнообразие символов и наличие повторяющихся паттернов.\n\n- Длина до 4 символов: 0 баллов\n- 4-7 символов: база 20 баллов\n- 8-11 символов: база 40 баллов\n- 12+ символов: база 60 баллов\n- +10 за заглавные, +10 за строчные, +10 за цифры, +10 за спецсимволы",
+    signature: "passwordStrength(password: string): number",
+    topics: ["Классы эквивалентности", "Граничные значения", "Проверка форматов"],
+    params: [
+      { name: "password", type: "string", description: "Пароль для оценки" },
+    ],
+    returnType: "number",
+    code: `function passwordStrength(password: string): number {
+  if (typeof password !== "string") throw new Error("Пароль должен быть строкой");
+  if (password.length === 0) return 0;
+  if (password.length > 128) throw new Error("Пароль слишком длинный (макс. 128 символов)");
+  let score = 0;
+  if (password.length >= 12) score = 60;
+  else if (password.length >= 8) score = 40;
+  else if (password.length >= 4) score = 20;
+  if (/[A-ZА-ЯЁ]/.test(password)) score += 10;
+  if (/[a-zа-яё]/.test(password)) score += 10;
+  if (/[0-9]/.test(password)) score += 10;
+  if (/[^a-zA-Zа-яА-ЯёЁ0-9]/.test(password)) score += 10;
+  return Math.min(score, 100);
+}`,
+    equivalenceClasses: [
+      { id: "ec1", name: "EC1: Пустой пароль", description: "Нулевая сила", exampleValues: [""] },
+      { id: "ec2", name: "EC2: Очень короткий (1-3)", description: "Минимальная длина, без бонусов", exampleValues: ["a", "ab", "abc"] },
+      { id: "ec3", name: "EC3: Короткий (4-7)", description: "База 20 баллов", exampleValues: ["abcd", "abcde12"] },
+      { id: "ec4", name: "EC4: Средний (8-11)", description: "База 40 баллов", exampleValues: ["abcdefgh", "Abc123!@"] },
+      { id: "ec5", name: "EC5: Длинный (12+)", description: "База 60 баллов", exampleValues: ["Abcdefgh12!@", "MyP@ssw0rd2024"] },
+      { id: "ec6", name: "EC6: Максимальный балл", description: "Все критерии выполнены, 12+ символов", exampleValues: ["Abc123!@xyz#"] },
+      { id: "ec7", name: "EC7: Только строчные", description: "Нет заглавных, цифр, спецсимволов", exampleValues: ["abcdefgh"] },
+      { id: "ec8", name: "EC8: Только заглавные", description: "Нет строчных, цифр, спецсимволов", exampleValues: ["ABCDEFGH"] },
+      { id: "ec9", name: "EC9: Только цифры", description: "Нет букв и спецсимволов", exampleValues: ["12345678"] },
+      { id: "ec10", name: "EC10: Не строковый тип", description: "Неверный тип", exampleValues: [123, null, undefined] },
+      { id: "ec11", name: "EC11: Превышение длины", description: "> 128 символов", exampleValues: ["a".repeat(129)] },
+    ],
+    boundaryValues: [
+      { value: "", description: "Пустой пароль" },
+      { value: "a", description: "1 символ" },
+      { value: "abcd", description: "4 символа (порог базы)" },
+      { value: "abcdefg", description: "7 символов (нижняя граница среднего)" },
+      { value: "abcdefgh", description: "8 символов (средний)" },
+      { value: "abcdefghijk", description: "11 символов (верхняя граница среднего)" },
+      { value: "Abcdefgh12!@", description: "12 символов (длинный)" },
+      { value: "a".repeat(128), description: "Максимальная длина" },
+    ],
+  },
+  {
+    id: 12,
+    name: "Расчёт доставки",
+    difficulty: "Средне",
+    description:
+      "Рассчитывает **стоимость доставки** на основе веса и расстояния. Использует阶梯 pricing:\n\n- До 1 кг: 100₽ базовая\n- 1-5 кг: 100 + (вес-1) × 50₽\n- 5-20 кг: 300 + (вес-5) × 30₽\n- 20+ кг: 750 + (вес-20) × 20₽\n- Расстояние до 10 км: коэффициент 1.0\n- 10-50 км: коэффициент 1.5\n- 50+ км: коэффициент 2.0",
+    signature: "calculateShipping(weight: number, distance: number): number",
+    topics: ["Классы эквивалентности", "Граничные значения", "Таблицы решений"],
+    params: [
+      { name: "weight", type: "number", description: "Вес посылки в кг (> 0)" },
+      { name: "distance", type: "number", description: "Расстояние в км (> 0)" },
+    ],
+    returnType: "number",
+    code: `function calculateShipping(weight: number, distance: number): number {
+  if (typeof weight !== "number" || typeof distance !== "number" || isNaN(weight) || isNaN(distance))
+    throw new Error("Аргументы должны быть числами");
+  if (weight <= 0) throw new Error("Вес должен быть положительным");
+  if (distance <= 0) throw new Error("Расстояние должно быть положительным");
+  if (weight > 100) throw new Error("Вес не может превышать 100 кг");
+  if (distance > 5000) throw new Error("Расстояние не может превышать 5000 км");
+  let baseCost: number;
+  if (weight <= 1) baseCost = 100;
+  else if (weight <= 5) baseCost = 100 + (weight - 1) * 50;
+  else if (weight <= 20) baseCost = 300 + (weight - 5) * 30;
+  else baseCost = 750 + (weight - 20) * 20;
+  let distanceMultiplier: number;
+  if (distance <= 10) distanceMultiplier = 1.0;
+  else if (distance <= 50) distanceMultiplier = 1.5;
+  else distanceMultiplier = 2.0;
+  return Math.round(baseCost * distanceMultiplier * 100) / 100;
+}`,
+    equivalenceClasses: [
+      { id: "ec1", name: "EC1: Лёгкая (≤1 кг)", description: "Базовая стоимость 100₽", exampleValues: [[0.5, 5], [1, 10]] },
+      { id: "ec2", name: "EC2: Средняя (1-5 кг)", description: "Линейный рост веса", exampleValues: [[2, 10], [5, 20]] },
+      { id: "ec3", name: "EC3: Тяжёлая (5-20 кг)", description: "Умеренный рост", exampleValues: [[10, 30], [20, 50]] },
+      { id: "ec4", name: "EC4: Очень тяжёлая (20+ кг)", description: "Максимальная категория веса", exampleValues: [[25, 10], [50, 100]] },
+      { id: "ec5", name: "EC5: Близкая (≤10 км)", description: "Коэффициент 1.0", exampleValues: [[2, 5], [10, 10]] },
+      { id: "ec6", name: "EC6: Средняя (10-50 км)", description: "Коэффициент 1.5", exampleValues: [[2, 25], [50, 50]] },
+      { id: "ec7", name: "EC7: Далёкая (50+ км)", description: "Коэффициент 2.0", exampleValues: [[2, 100], [5, 500]] },
+      { id: "ec8", name: "EC8: weight ≤ 0", description: "Недопустимый вес", exampleValues: [[0, 10], [-1, 10]] },
+      { id: "ec9", name: "EC9: distance ≤ 0", description: "Недопустимое расстояние", exampleValues: [[2, 0], [2, -5]] },
+      { id: "ec10", name: "EC10: weight > 100", description: "Превышение веса", exampleValues: [[101, 10]] },
+      { id: "ec11", name: "EC11: distance > 5000", description: "Превышение расстояния", exampleValues: [[2, 5001]] },
+      { id: "ec12", name: "EC12: Нечисловые аргументы", description: "Неверный тип", exampleValues: [["2", 10], [2, "10"]] },
+    ],
+    boundaryValues: [
+      { value: [0.1, 1], description: "Минимальные значения" },
+      { value: [1, 10], description: "Граница лёгкой/близкой" },
+      { value: [5, 50], description: "Граница средней/средней" },
+      { value: [20, 10], description: "Граница тяжёлой" },
+      { value: [100, 5000], description: "Максимальные допустимые" },
+      { value: [101, 10], description: "Превышение веса" },
+      { value: [2, 5001], description: "Превышение расстояния" },
+    ],
+  },
+  {
+    id: 13,
+    name: "Валидация номера телефона",
+    difficulty: "Легко",
+    description:
+      "Проверяет корректность **номера телефона** в международном формате:\n\n- Должен начинаться с `+`\n- Содержать только цифры после `+`\n- Длина от 7 до 15 цифр (после `+`)\n- Допустимые разделители: `-`, ` `, `(`, `)`",
+    signature: "validatePhone(phone: string): { valid: boolean; reason?: string }",
+    topics: ["Классы эквивалентности", "Проверка форматов"],
+    params: [
+      { name: "phone", type: "string", description: "Номер телефона для проверки" },
+    ],
+    returnType: "{ valid: boolean; reason?: string }",
+    code: `function validatePhone(phone: string): { valid: boolean; reason?: string } {
+  if (typeof phone !== "string") throw new Error("Номер должен быть строкой");
+  if (phone.length === 0) return { valid: false, reason: "Пустая строка" };
+  if (!phone.startsWith("+")) return { valid: false, reason: "Номер должен начинаться с +" };
+  const digits = phone.replace(/[\\s\\-()]/g, "");
+  if (!/^\+\\d+$/.test(digits)) return { valid: false, reason: "Разрешены только цифры, пробелы, дефисы и скобки" };
+  const digitCount = digits.length - 1;
+  if (digitCount < 7) return { valid: false, reason: "Слишком короткий номер (мин. 7 цифр)" };
+  if (digitCount > 15) return { valid: false, reason: "Слишком длинный номер (макс. 15 цифр)" };
+  return { valid: true };
+}`,
+    equivalenceClasses: [
+      { id: "ec1", name: "EC1: Валидный номер", description: "Корректный международный формат", exampleValues: ["+79991234567", "+12345678901"] },
+      { id: "ec2", name: "EC2: Пустая строка", description: "Пустой ввод", exampleValues: [""] },
+      { id: "ec3", name: "EC3: Без +", description: "Отсутствует префикс", exampleValues: ["79991234567", "89991234567"] },
+      { id: "ec4", name: "EC4: Слишком короткий", description: "Менее 7 цифр", exampleValues: ["+123456", "+7999"] },
+      { id: "ec5", name: "EC5: Слишком длинный", description: "Более 15 цифр", exampleValues: ["+1234567890123456"] },
+      { id: "ec6", name: "EC6: С разделителями", description: "Валидный с пробелами/скобками", exampleValues: ["+7 (999) 123-45-67", "+1-234-567-8901"] },
+      { id: "ec7", name: "EC7: Неверные символы", description: "Буквы или спецсимволы", exampleValues: ["+7999abc1234", "+7999!234567"] },
+      { id: "ec8", name: "EC8: Только +", description: "Нет цифр", exampleValues: ["+"] },
+      { id: "ec9", name: "EC9: Не строковый тип", description: "Неверный тип", exampleValues: [79991234567, null, undefined] },
+    ],
+    boundaryValues: [
+      { value: "+1234567", description: "Минимальная длина (7 цифр)" },
+      { value: "+123456", description: "На 1 цифру меньше минимума" },
+      { value: "+79991234567", description: "Стандартный российский номер" },
+      { value: "+123456789012345", description: "Максимальная длина (15 цифр)" },
+      { value: "+1234567890123456", description: "На 1 цифру больше максимума" },
+      { value: "+", description: "Только плюс" },
+      { value: "+7 (999) 123-45-67", description: "С разделителями" },
     ],
   },
 ];

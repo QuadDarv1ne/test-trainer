@@ -298,6 +298,100 @@ export function TheoryPanel() {
           </AccordionContent>
         </AccordionItem>
 
+        {/* Pairwise Testing */}
+        <AccordionItem
+          value="pairwise"
+          className="border rounded-lg px-4 data-[state=open]:border-cyan-300 data-[state=open]:bg-cyan-50/50 dark:data-[state=open]:border-cyan-800 dark:data-[state=open]:bg-cyan-950/20"
+        >
+          <AccordionTrigger className="hover:no-underline py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-400">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-sm">{t("theory_pw_title")}</h3>
+                <p className="text-xs text-muted-foreground">
+                  {t("theory_pw_subtitle")}
+                </p>
+              </div>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="pb-4">
+            <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+              <p>{t("theory_pw_intro")}</p>
+              <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+                <p className="font-medium text-foreground text-xs uppercase tracking-wider">
+                  {t("theory_pw_why")}
+                </p>
+                <p className="text-xs">{t("theory_pw_why_desc")}</p>
+              </div>
+              <div className="bg-cyan-50 dark:bg-cyan-900/20 rounded-lg p-3">
+                <p className="font-medium text-cyan-800 dark:text-cyan-300 text-xs mb-1 flex items-center gap-1">
+                  <Lightbulb className="h-3.5 w-3.5" />
+                  {t("theory_pw_example_text")}
+                </p>
+                <p className="text-xs">{t("theory_pw_example_desc")}</p>
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* State Transition Testing */}
+        <AccordionItem
+          value="state_transition"
+          className="border rounded-lg px-4 data-[state=open]:border-violet-300 data-[state=open]:bg-violet-50/50 dark:data-[state=open]:border-violet-800 dark:data-[state=open]:bg-violet-950/20"
+        >
+          <AccordionTrigger className="hover:no-underline py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-400">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-sm">{t("theory_st_title")}</h3>
+                <p className="text-xs text-muted-foreground">
+                  {t("theory_st_subtitle")}
+                </p>
+              </div>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="pb-4">
+            <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+              <p>{t("theory_st_intro")}</p>
+              <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+                <p className="font-medium text-foreground text-xs uppercase tracking-wider">
+                  {t("theory_st_components")}
+                </p>
+                <ul className="space-y-1.5">
+                  <li className="flex items-start gap-2">
+                    <span className="text-violet-500 mt-0.5">●</span>
+                    <span>{t("theory_st_states")}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-violet-500 mt-0.5">●</span>
+                    <span>{t("theory_st_transitions")}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-violet-500 mt-0.5">●</span>
+                    <span>{t("theory_st_events")}</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="bg-violet-50 dark:bg-violet-900/20 rounded-lg p-3">
+                <p className="font-medium text-violet-800 dark:text-violet-300 text-xs mb-1 flex items-center gap-1">
+                  <Lightbulb className="h-3.5 w-3.5" />
+                  {t("theory_ec_example")}
+                </p>
+                <p className="text-xs font-mono">{t("theory_st_example_text")}</p>
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
         {/* Error Guessing */}
         <AccordionItem
           value="error_guessing"
