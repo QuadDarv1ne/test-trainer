@@ -155,7 +155,7 @@ export function TheoryPanel() {
               <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3">
                 <p className="font-medium text-amber-800 dark:text-amber-300 text-xs mb-1 flex items-center gap-1">
                   <Lightbulb className="h-3.5 w-3.5" />
-                  {t("theory_ec_example")}
+                  {t("theory_bv_example")}
                 </p>
                 <p className="text-xs">
                   {t("theory_bv_example_text")}
@@ -231,6 +231,129 @@ export function TheoryPanel() {
           </AccordionContent>
         </AccordionItem>
 
+        {/* Decision Tables */}
+        <AccordionItem
+          value="decision_tables"
+          className="border rounded-lg px-4 data-[state=open]:border-indigo-300 data-[state=open]:bg-indigo-50/50 dark:data-[state=open]:border-indigo-800 dark:data-[state=open]:bg-indigo-950/20"
+        >
+          <AccordionTrigger className="hover:no-underline py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <line x1="3" y1="9" x2="21" y2="9" />
+                  <line x1="3" y1="15" x2="21" y2="15" />
+                  <line x1="9" y1="3" x2="9" y2="21" />
+                  <line x1="15" y1="3" x2="15" y2="21" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-sm">{t("theory_dt_title")}</h3>
+                <p className="text-xs text-muted-foreground">
+                  {t("theory_dt_subtitle")}
+                </p>
+              </div>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="pb-4">
+            <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+              <p>{t("theory_dt_intro")}</p>
+              <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+                <p className="font-medium text-foreground text-xs uppercase tracking-wider">
+                  {t("theory_dt_how")}
+                </p>
+                <ul className="space-y-1.5">
+                  <li className="flex items-start gap-2">
+                    <span className="text-indigo-500 mt-0.5">●</span>
+                    <span>{t("theory_dt_step1")}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-indigo-500 mt-0.5">●</span>
+                    <span>{t("theory_dt_step2")}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-indigo-500 mt-0.5">●</span>
+                    <span>{t("theory_dt_step3")}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-indigo-500 mt-0.5">●</span>
+                    <span>{t("theory_dt_step4")}</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-lg p-3">
+                <p className="font-medium text-indigo-800 dark:text-indigo-300 text-xs mb-1 flex items-center gap-1">
+                  <Lightbulb className="h-3.5 w-3.5" />
+                  {t("theory_dt_title")} — {t("theory_ec_example").toLowerCase()}
+                </p>
+                <p className="text-xs">{t("theory_dt_example_text")}</p>
+                <ul className="mt-1 space-y-0.5 text-xs font-mono">
+                  <li>• {t("theory_dt_row1")}</li>
+                  <li>• {t("theory_dt_row2")}</li>
+                  <li>• {t("theory_dt_row3")}</li>
+                  <li>• {t("theory_dt_row4")}</li>
+                </ul>
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Error Guessing */}
+        <AccordionItem
+          value="error_guessing"
+          className="border rounded-lg px-4 data-[state=open]:border-orange-300 data-[state=open]:bg-orange-50/50 dark:data-[state=open]:border-orange-800 dark:data-[state=open]:bg-orange-950/20"
+        >
+          <AccordionTrigger className="hover:no-underline py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-sm">{t("theory_eg_title")}</h3>
+                <p className="text-xs text-muted-foreground">
+                  {t("theory_eg_subtitle")}
+                </p>
+              </div>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="pb-4">
+            <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+              <p>{t("theory_eg_intro")}</p>
+              <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+                <p className="font-medium text-foreground text-xs uppercase tracking-wider">
+                  {t("theory_eg_common")}
+                </p>
+                <ul className="space-y-1.5">
+                  <li className="flex items-start gap-2">
+                    <span className="text-orange-500 mt-0.5">●</span>
+                    <span>{t("theory_eg_1")}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-orange-500 mt-0.5">●</span>
+                    <span>{t("theory_eg_2")}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-orange-500 mt-0.5">●</span>
+                    <span>{t("theory_eg_3")}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-orange-500 mt-0.5">●</span>
+                    <span>{t("theory_eg_4")}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-orange-500 mt-0.5">●</span>
+                    <span>{t("theory_eg_5")}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
         {/* Tips */}
         <AccordionItem
           value="tips"
@@ -252,36 +375,25 @@ export function TheoryPanel() {
           <AccordionContent className="pb-4">
             <div className="space-y-2 text-sm text-muted-foreground leading-relaxed">
               <ul className="space-y-2">
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-500 mt-0.5 shrink-0">1.</span>
-                  <span>
-                    <strong>{t("theory_tip1").split("—")[0]}</strong>—{t("theory_tip1").split("—")[1]}
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-500 mt-0.5 shrink-0">2.</span>
-                  <span>
-                    <strong>{t("theory_tip2").split("—")[0]}</strong>—{t("theory_tip2").split("—")[1]}
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-500 mt-0.5 shrink-0">3.</span>
-                  <span>
-                    <strong>{t("theory_tip3").split("—")[0]}</strong>—{t("theory_tip3").split("—")[1]}
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-500 mt-0.5 shrink-0">4.</span>
-                  <span>
-                    <strong>{t("theory_tip4").split("—")[0]}</strong>—{t("theory_tip4").split("—")[1]}
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-500 mt-0.5 shrink-0">5.</span>
-                  <span>
-                    <strong>{t("theory_tip5").split("—")[0]}</strong>—{t("theory_tip5").split("—")[1]}
-                  </span>
-                </li>
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => {
+                  const key = `theory_tip${n}`;
+                  const text = t(key);
+                  const parts = text.split("—");
+                  return (
+                    <li className="flex items-start gap-2" key={n}>
+                      <span className="text-emerald-500 mt-0.5 shrink-0">{n}.</span>
+                      <span>
+                        {parts.length > 1 ? (
+                          <>
+                            <strong>{parts[0]}</strong>—{parts.slice(1).join("—")}
+                          </>
+                        ) : (
+                          <strong>{text}</strong>
+                        )}
+                      </span>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </AccordionContent>
