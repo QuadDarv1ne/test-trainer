@@ -322,6 +322,11 @@ export default function Home() {
                       Назад
                     </Button>
                     <h2 className="text-lg sm:text-xl font-semibold">Тренажёр: {selectedTask.name}</h2>
+                    {savedProgress[selectedTask.id]?.score !== undefined && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                        Лучший: {savedProgress[selectedTask.id].score}%
+                      </span>
+                    )}
                   </div>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                     {/* Left panel - task description */}
