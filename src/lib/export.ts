@@ -1,5 +1,5 @@
 import { loadAttempts, loadProgress, loadStreak, type AttemptRecord, type TaskProgress } from "@/lib/storage";
-import { loadUnlockedAchievements } from "@/lib/achievements";
+import { loadUnlockedAchievements, achievements } from "@/lib/achievements";
 import { tasks } from "@/lib/tasks";
 
 export interface ExportData {
@@ -60,7 +60,7 @@ export function generateExportJSON(): string {
       currentStreak: streak.currentStreak,
       longestStreak: streak.longestStreak,
       achievementsUnlocked: achievements.length,
-      achievementsTotal: 12,
+      achievementsTotal: achievements.length,
     },
     bestProgress,
     attempts,
@@ -74,7 +74,7 @@ export function generateExportCSV(): string {
   const attempts = loadAttempts();
   const progress = loadProgress();
   const streak = loadStreak();
-  const achievements = loadUnlockedAchievements();
+  const unlockedAchievements = loadUnlockedAchievements();
 
   const BOM = "\uFEFF";
   const lines: string[] = [];
@@ -90,7 +90,7 @@ export function generateExportCSV(): string {
   lines.push(`Summary,Average Score,${avgScore}%`);
   lines.push(`Summary,Current Streak,${streak.currentStreak}`);
   lines.push(`Summary,Longest Streak,${streak.longestStreak}`);
-  lines.push(`Summary,Achievements,${achievements.length}/12`);
+  lines.push(`Summary,Achievements,${unlockedAchievements.length}/${achievements.length}`);
   lines.push(`Summary,Export Date,${new Date().toISOString()}`);
   lines.push("");
 
@@ -115,13 +115,8 @@ export function generateExportCSV(): string {
 
   // Achievements
   lines.push("Section,Achievement ID,Status");
-  const allAchievementIds = [
-    "first_blood", "first_perfect", "half_done", "all_done", "all_perfect",
-    "persistent", "explorer", "good_student", "exam_passer", "boundary_hunter",
-    "speed_demon", "completer",
-  ];
-  for (const id of allAchievementIds) {
-    lines.push(`Achievement,${id},${achievements.includes(id) ? "Unlocked" : "Locked"}`);
+  for (const a of achievements) {
+    lines.push(`Achievement,${a.id},${unlockedAchievements.includes(a.id) ? "Unlocked" : "Locked"}`);
   }
 
   return BOM + lines.join("\n");

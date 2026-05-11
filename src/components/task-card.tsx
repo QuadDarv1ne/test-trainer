@@ -12,6 +12,10 @@ import {
   Calendar,
   Triangle,
   Lock,
+  CaseSensitive,
+  CalendarCheck,
+  ArrowUpDown,
+  Mail,
 } from "lucide-react";
 import { useLocale } from "@/lib/i18n.client";
 import { useAppStore } from "@/lib/store";
@@ -24,6 +28,10 @@ const taskIcons: Record<number, React.ReactNode> = {
   4: <Calendar className="h-5 w-5" />,
   5: <Triangle className="h-5 w-5" />,
   6: <Lock className="h-5 w-5" />,
+  7: <CaseSensitive className="h-5 w-5" />,
+  8: <CalendarCheck className="h-5 w-5" />,
+  9: <ArrowUpDown className="h-5 w-5" />,
+  10: <Mail className="h-5 w-5" />,
 };
 
 interface TaskCardProps {

@@ -24,10 +24,12 @@ import type { TestCase, EvaluationResult } from "@/lib/evaluator";
 import { toast } from "sonner";
 import { saveAttempt } from "@/lib/storage";
 import { ResultsPanel } from "./results-panel";
+import { useLocale } from "@/lib/i18n.client";
 
 type ExamState = "setup" | "running" | "results";
 
 export function ExamMode() {
+  const { t } = useLocale();
   const [examState, setExamState] = useState<ExamState>("setup");
   const [selectedTasks, setSelectedTasks] = useState<number[]>([]);
   const [timeLimit, setTimeLimit] = useState(10); // minutes
@@ -106,7 +108,7 @@ export function ExamMode() {
 
   const startExam = () => {
     if (selectedTasks.length === 0) {
-      toast.error("Выберите хотя бы одно задание");
+      toast.error(t("exam_select_at_least_one"));
       return;
     }
     // Shuffle selected tasks
@@ -140,15 +142,15 @@ export function ExamMode() {
     }));
     setExamInputs(task.params.map(() => ""));
     setExamExpected("");
-    toast.success("Тест-кейс добавлен");
-  }, [examTasks, currentTaskIndex, examInputs, examExpected, examCategory]);
+    toast.success(t("exam_add_test_case"));
+  }, [examTasks, currentTaskIndex, examInputs, examExpected, examCategory, t]);
 
   const submitCurrentTask = useCallback(() => {
     const task = examTasks[currentTaskIndex];
     if (!task) return;
     const tcs = examTestCases[task.id] || [];
     if (tcs.length === 0) {
-      toast.error("Добавьте хотя бы один тест-кейс");
+      toast.error(t("exam_add_at_least_one"));
       return;
     }
     const result = evaluateTestCases(task, tcs);
@@ -170,7 +172,7 @@ export function ExamMode() {
       setCurrentTaskIndex((i) => i + 1);
       setExamInputs(nextTask.params.map(() => ""));
       setExamExpected("");
-      toast.success(`Задание «${task.name}» проверено! Оценка: ${result.overallScore}%`);
+      toast.success(t("exam_task_checked").replace("{name}", task.name).replace("{score}", String(result.overallScore)));
     } else {
       setExamState("results");
       window.dispatchEvent(new Event("achievements-updated"));
@@ -187,7 +189,7 @@ export function ExamMode() {
         setTimeout(() => setShowConfetti(false), 3500);
       }
     }
-  }, [examTasks, currentTaskIndex, examTestCases, examResults]);
+  }, [examTasks, currentTaskIndex, examTestCases, examResults, t]);
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60);
@@ -232,17 +234,15 @@ export function ExamMode() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Timer className="h-5 w-5 text-emerald-600" />
-              Режим экзамена
+              {t("exam_title")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Пройдите несколько заданий на время. Выбранные задания будут
-              перемешаны, и вы не сможете посмотреть теорию или подсказки до
-              окончания экзамена.
+              {t("exam_subtitle")}
             </p>
             <div className="space-y-2">
-              <p className="text-xs font-medium">Выберите задания:</p>
+              <p className="text-xs font-medium">{t("exam_select_tasks_label")}</p>
               <div className="grid grid-cols-2 gap-2">
                 {tasks.map((task) => (
                   <button
@@ -263,19 +263,19 @@ export function ExamMode() {
               </div>
             </div>
             <div className="space-y-2">
-              <p className="text-xs font-medium">Лимит времени (минуты):</p>
+              <p className="text-xs font-medium">{t("exam_time_limit")}</p>
               <div className="flex gap-2">
-                {[5, 10, 15, 20].map((t) => (
+                {[5, 10, 15, 20].map((minutes) => (
                   <button
-                    key={t}
-                    onClick={() => setTimeLimit(t)}
+                    key={minutes}
+                    onClick={() => setTimeLimit(minutes)}
                     className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
-                      timeLimit === t
+                      timeLimit === minutes
                         ? "border-emerald-500 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
                         : "border-border hover:border-emerald-300"
                     }`}
                   >
-                    {t} мин
+                    {minutes} {t("exam_min")}
                   </button>
                 ))}
               </div>
@@ -287,7 +287,7 @@ export function ExamMode() {
                 <Clock className="h-3.5 w-3.5" />
                 <span>
                   ≈ {Math.floor(timePerTask / 60)}:
-                  {(timePerTask % 60).toString().padStart(2, "0")} на задание
+                  {(timePerTask % 60).toString().padStart(2, "0")} {t("exam_per_task_time")}
                 </span>
               </div>
             )}
@@ -297,7 +297,7 @@ export function ExamMode() {
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
               disabled={selectedTasks.length === 0}
             >
-              Начать экзамен ({selectedTasks.length} заданий)
+              {t("exam_start_btn").replace("{count}", String(selectedTasks.length))}
             </Button>
           </CardContent>
         </Card>
@@ -346,7 +346,7 @@ export function ExamMode() {
               </span>
             </div>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span>Задание {currentTaskIndex + 1} из {examTasks.length}</span>
+              <span>{t("exam_task_progress").replace("{current}", String(currentTaskIndex + 1)).replace("{total}", String(examTasks.length))}</span>
               <Badge variant="secondary">{task.name}</Badge>
             </div>
           </div>
@@ -411,7 +411,7 @@ export function ExamMode() {
             ))}
 
             <div className="space-y-1">
-              <Label className="text-xs font-medium">Ожидаемый результат</Label>
+              <Label className="text-xs font-medium">{t("exam_expected_result")}</Label>
               <Input
                 placeholder={
                   task.returnType === "boolean"
@@ -438,7 +438,7 @@ export function ExamMode() {
                   !examExpected.trim()
                 }
               >
-                Добавить
+                {t("exam_add")}
               </Button>
               <Button
                 size="sm"
@@ -447,12 +447,12 @@ export function ExamMode() {
                 disabled={taskTestCases.length === 0}
               >
                 <ChevronRight className="h-3.5 w-3.5 mr-1" />
-                {currentTaskIndex < examTasks.length - 1 ? "Далее" : "Завершить"}
+                {currentTaskIndex < examTasks.length - 1 ? t("exam_next") : t("exam_complete")}
               </Button>
             </div>
             {taskTestCases.length > 0 && (
               <div className="text-xs text-muted-foreground">
-                Тест-кейсов: {taskTestCases.length}
+                {t("exam_test_cases_count").replace("{count}", String(taskTestCases.length))}
               </div>
             )}
           </CardContent>
@@ -472,14 +472,13 @@ export function ExamMode() {
       <Card className="border-emerald-200 dark:border-emerald-800">
         <CardContent className="pt-6 text-center">
           <Trophy className="h-10 w-10 text-amber-500 mx-auto mb-2" />
-          <h2 className="text-xl font-bold">Экзамен завершён!</h2>
+          <h2 className="text-xl font-bold">{t("exam_finished_title")}</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Средняя оценка: <strong className="text-lg">{avgScore}%</strong> по{" "}
-            {examResults.length} заданиям
+            {t("exam_avg_score").replace("{score}", String(avgScore)).replace("{count}", String(examResults.length))}
           </p>
           {avgScore >= 80 && (
             <p className="text-sm text-emerald-600 dark:text-emerald-400 mt-1">
-              🎉 Отличный результат!
+              {t("exam_excellent")}
             </p>
           )}
         </CardContent>
@@ -490,7 +489,7 @@ export function ExamMode() {
       <div className="flex justify-center gap-2">
         <Button variant="outline" onClick={() => setExamState("setup")}>
           <RotateCcw className="h-4 w-4 mr-1" />
-          Новый экзамен
+          {t("exam_new_exam")}
         </Button>
       </div>
     </motion.div>

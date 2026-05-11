@@ -35,8 +35,8 @@ export function Confetti({ active }: { active: boolean }) {
       return;
     }
 
-    const newParticles: Particle[] = Array.from({ length: 50 }, (_, i) => ({
-      id: i,
+    const newParticles: Particle[] = Array.from({ length: 50 }, () => ({
+      id: Math.random(),
       x: 50 + (Math.random() - 0.5) * 20,
       y: -10,
       color: COLORS[Math.floor(Math.random() * COLORS.length)],

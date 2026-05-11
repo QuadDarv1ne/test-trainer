@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Flame, Trash2, Download } from "lucide-react";
 import { downloadJSON, downloadCSV } from "@/lib/export";
 import { tasks } from "@/lib/tasks";
-import { loadStreak, loadAttempts, type StreakData } from "@/lib/storage";
+import { loadStreak, loadAttempts, loadProgress, type StreakData } from "@/lib/storage";
 import { useAppStore } from "@/lib/store";
 import { toast } from "sonner";
 import {
@@ -181,15 +181,4 @@ export function StatisticsPanel() {
       </div>
     </div>
   );
-}
-
-// Helper to load progress
-function loadProgress(): Record<number, { score: number }> {
-  try {
-    const raw = localStorage.getItem("test-trainer-progress");
-    if (!raw) return {};
-    return JSON.parse(raw);
-  } catch {
-    return {};
-  }
 }
