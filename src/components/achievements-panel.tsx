@@ -9,8 +9,26 @@ import {
   loadUnlockedAchievements,
   type Achievement,
 } from "@/lib/achievements";
+import { useLocale } from "@/lib/i18n.client";
+
+// Map achievement IDs to i18n keys
+const achievementNameKeys: Record<string, string> = {
+  first_blood: "ach_first_blood",
+  first_perfect: "ach_first_perfect",
+  half_done: "ach_half_done",
+  all_done: "ach_all_done",
+  all_perfect: "ach_all_perfect",
+  persistent: "ach_persistent",
+  explorer: "ach_explorer",
+  good_student: "ach_good_student",
+  exam_passer: "ach_exam_passer",
+  boundary_hunter: "ach_boundary_hunter",
+  speed_demon: "ach_speed_demon",
+  completer: "ach_completer",
+};
 
 export function AchievementsPanel() {
+  const { t } = useLocale();
   const [unlockedIds, setUnlockedIds] = useState<string[]>(() =>
     loadUnlockedAchievements()
   );
@@ -35,10 +53,10 @@ export function AchievementsPanel() {
         <CardContent className="pt-6">
           <div className="text-center mb-4">
             <h2 className="text-lg font-bold flex items-center justify-center gap-2">
-              🏅 Достижения
+              🏅 {t("achievements_title")}
             </h2>
             <p className="text-xs text-muted-foreground mt-1">
-              {unlockedCount} из {totalCount} получено
+              {unlockedCount} {t("progress_of")} {totalCount} — {t("achievements_unlocked")}
             </p>
           </div>
           {/* Progress bar */}
@@ -57,6 +75,9 @@ export function AchievementsPanel() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {achievements.map((achievement) => {
           const isUnlocked = unlockedIds.includes(achievement.id);
+          const nameKey = achievementNameKeys[achievement.id];
+          // Map description by finding the achievement and using its ID
+          const descKey = nameKey ? nameKey + "_desc" : "";
           return (
             <motion.div
               key={achievement.id}
@@ -72,7 +93,7 @@ export function AchievementsPanel() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-medium truncate">
-                      {achievement.name}
+                      {nameKey ? t(nameKey) : achievement.name}
                     </p>
                     {isUnlocked && (
                       <Badge className="bg-amber-100 text-amber-800 text-[9px] dark:bg-amber-900/30 dark:text-amber-400 shrink-0">
@@ -81,7 +102,7 @@ export function AchievementsPanel() {
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {achievement.description}
+                    {descKey ? t(descKey) : achievement.description}
                   </p>
                 </div>
               </div>
@@ -94,6 +115,8 @@ export function AchievementsPanel() {
 }
 
 export function AchievementToast({ achievement }: { achievement: Achievement }) {
+  const { t } = useLocale();
+  const nameKey = achievementNameKeys[achievement.id];
   return (
     <motion.div
       initial={{ opacity: 0, y: 50, scale: 0.9 }}
@@ -104,9 +127,9 @@ export function AchievementToast({ achievement }: { achievement: Achievement }) 
       <span className="text-3xl">{achievement.icon}</span>
       <div>
         <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
-          Достижение разблокировано!
+          {t("achievements_unlocked_toast")}
         </p>
-        <p className="text-sm font-bold">{achievement.name}</p>
+        <p className="text-sm font-bold">{nameKey ? t(nameKey) : achievement.name}</p>
       </div>
     </motion.div>
   );

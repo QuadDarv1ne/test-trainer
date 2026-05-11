@@ -1,16 +1,15 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
 import { tasks } from "@/lib/tasks";
-import type { Task, TestCaseCategory } from "@/lib/tasks";
-import type { TestCase, EvaluationResult } from "@/lib/evaluator";
+import type { TestCaseCategory } from "@/lib/tasks";
+import type { TestCase } from "@/lib/evaluator";
 import { evaluateTestCases } from "@/lib/evaluator";
-import { saveProgress, loadProgress, saveCurrentSession, loadCurrentSession, type TaskProgress, } from "@/lib/storage";
+import { useAppStore } from "@/lib/store";
 import { TaskCard } from "@/components/task-card";
 import { TaskWorkspace } from "@/components/task-workspace";
 import { TestForm } from "@/components/test-form";
@@ -18,6 +17,7 @@ import { TestList } from "@/components/test-list";
 import { ResultsPanel } from "@/components/results-panel";
 import { TheoryPanel } from "@/components/theory-panel";
 import { StatisticsPanel } from "@/components/statistics-panel";
+import { useLocale } from "@/lib/i18n.client";
 import { AchievementsPanel } from "@/components/achievements-panel";
 import { Beaker, ListChecks, Dumbbell, BarChart3, BookOpen, ArrowLeft, Sun, Moon, Trophy, } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -46,102 +46,84 @@ function ThemeToggle() {
   );
 }
 
+function LocaleToggle() {
+  const { locale, setLocale } = useLocale();
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      className="h-9 text-xs font-medium text-muted-foreground hover:text-foreground"
+      onClick={() => setLocale(locale === "ru" ? "en" : "ru")}
+    >
+      {locale === "ru" ? "EN" : "RU"}
+    </Button>
+  );
+}
+
 export default function Home() {
-  const [activeTab, setActiveTab] = useState("tasks");
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [testCases, setTestCases] = useState<TestCase[]>([]);
-  const [evaluationResult, setEvaluationResult] = useState<EvaluationResult | null>(null);
-  const [savedProgress, setSavedProgress] = useState<Record<number, TaskProgress>>({});
+  const { t } = useLocale();
+
+  // Store state
+  const activeTab = useAppStore((s) => s.activeTab);
+  const setActiveTab = useAppStore((s) => s.setActiveTab);
+  const selectedTask = useAppStore((s) => s.selectedTask);
+  const setSelectedTask = useAppStore((s) => s.setSelectedTask);
+  const testCases = useAppStore((s) => s.testCases);
+  const addTestCase = useAppStore((s) => s.addTestCase);
+  const removeTestCase = useAppStore((s) => s.removeTestCase);
+  const reorderTestCases = useAppStore((s) => s.reorderTestCases);
+  const evaluationResult = useAppStore((s) => s.evaluationResult);
+  const setEvaluationResult = useAppStore((s) => s.setEvaluationResult);
+  const savedProgress = useAppStore((s) => s.savedProgress);
+  const updateProgress = useAppStore((s) => s.updateProgress);
+  const loadProgress = useAppStore((s) => s.loadProgress);
 
   // Load saved progress on mount
   useEffect(() => {
-    setSavedProgress(loadProgress());
-  }, []);
+    loadProgress();
+  }, [loadProgress]);
 
   const completedCount = useMemo(() => {
     return Object.keys(savedProgress).length;
   }, [savedProgress]);
 
-  const handleSelectTask = useCallback((task: Task) => {
-    setSelectedTask(task);
-    setEvaluationResult(null);
-    setActiveTab("trainer");
-    // Load saved session for this task
-    const savedSession = loadCurrentSession(task.id);
-    if (savedSession && savedSession.length > 0) {
-      setTestCases(savedSession);
-    } else {
-      setTestCases([]);
-    }
-  }, []);
+  const handleAddTestCase = (
+    inputs: string[],
+    expected: string,
+    category: TestCaseCategory,
+    comment: string
+  ) => {
+    const newCase: TestCase = {
+      id: `tc-${crypto.randomUUID?.() ?? Date.now().toString(36) + Math.random().toString(36).slice(2)}`,
+      inputs,
+      expectedOutput: expected,
+      category,
+      comment,
+    };
+    addTestCase(newCase);
+    toast.success(t("toast_tc_added"));
+  };
 
-  const handleAddTestCase = useCallback(
-    (inputs: string[], expected: string, category: TestCaseCategory, comment: string) => {
-      const newCase: TestCase = {
-        id: `tc-${crypto.randomUUID?.() ?? Date.now().toString(36) + Math.random().toString(36).slice(2)}`,
-        inputs,
-        expectedOutput: expected,
-        category,
-        comment,
-      };
-      setTestCases((prev) => {
-        const updated = [...prev, newCase];
-        // Save to localStorage
-        if (selectedTask) {
-          saveCurrentSession(selectedTask.id, updated);
-        }
-        return updated;
-      });
-      toast.success("Тест-кейс добавлен");
-    },
-    [selectedTask]
-  );
-
-  const handleRemoveTestCase = useCallback(
-    (id: string) => {
-      setTestCases((prev) => {
-        const updated = prev.filter((tc) => tc.id !== id);
-        // Save to localStorage
-        if (selectedTask) {
-          saveCurrentSession(selectedTask.id, updated);
-        }
-        return updated;
-      });
-      toast.info("Тест-кейс удалён");
-    },
-    [selectedTask]
-  );
-
-  const handleReorderTestCases = useCallback(
-    (reordered: typeof testCases) => {
-      setTestCases(reordered);
-      if (selectedTask) {
-        saveCurrentSession(selectedTask.id, reordered);
-      }
-    },
-    [selectedTask]
-  );
-
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = () => {
     if (!selectedTask || testCases.length === 0) return;
     const result = evaluateTestCases(selectedTask, testCases);
     setEvaluationResult(result);
     setActiveTab("results");
-    // Save best progress
-    saveProgress(selectedTask.id, result.overallScore, testCases);
-    setSavedProgress(loadProgress());
-    toast.success(`Проверка завершена! Оценка: ${result.overallScore}%`);
-  }, [selectedTask, testCases]);
+    updateProgress(selectedTask.id, result.overallScore, testCases);
+    toast.success(t("toast_check_done").replace("{score}", String(result.overallScore)));
+  };
 
-  const handleReset = useCallback(() => {
-    setTestCases([]);
+  const clearTestCases = useAppStore((s) => s.clearTestCases);
+
+  const handleReset = () => {
+    clearTestCases();
     setEvaluationResult(null);
     setActiveTab("trainer");
-  }, []);
+  };
 
-  const handleBackToTasks = useCallback(() => {
+  const handleBackToTasks = () => {
     setActiveTab("tasks");
-  }, []);
+  };
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -158,7 +140,7 @@ export default function Home() {
         if (activeTab === "trainer" && testCases.length > 0) {
           e.preventDefault();
           const lastCase = testCases[testCases.length - 1];
-          handleRemoveTestCase(lastCase.id);
+          removeTestCase(lastCase.id);
         }
       }
       // Escape to reset
@@ -171,7 +153,7 @@ export default function Home() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeTab, selectedTask, testCases, handleSubmit, handleRemoveTestCase, handleReset]);
+  }, [activeTab, selectedTask, testCases, handleSubmit, removeTestCase]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 dark:from-zinc-950 dark:via-zinc-900 dark:to-emerald-950/20">
@@ -184,13 +166,16 @@ export default function Home() {
                 <Beaker className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Тренажёр тестирования</h1>
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight">{t("header_title")}</h1>
                 <p className="text-xs sm:text-sm text-muted-foreground">
-                  Генератор тест-кейсов • Методы чёрного ящика
+                  {t("header_subtitle")}
                 </p>
               </div>
             </div>
-            <ThemeToggle />
+            <div className="flex items-center gap-1">
+              <LocaleToggle />
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </header>
@@ -203,8 +188,7 @@ export default function Home() {
             <div className="flex items-center gap-2 text-sm">
               <Trophy className="h-4 w-4 text-emerald-600" />
               <span className="font-medium">
-                {" "}
-                Выполнено: {completedCount} из {TOTAL_TASKS} заданий{" "}
+                {" "}{t("progress_completed")}: {completedCount} {t("progress_of")} {TOTAL_TASKS}{" "}
               </span>
             </div>
             <span className="text-xs text-muted-foreground">
@@ -251,8 +235,8 @@ export default function Home() {
               className="text-xs sm:text-sm py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white"
             >
               <ListChecks className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              <span className="hidden sm:inline">Задания</span>
-              <span className="sm:hidden">Зад</span>
+              <span className="hidden sm:inline">{t("tab_tasks")}</span>
+              <span className="sm:hidden">{t("tab_tasks_short")}</span>
             </TabsTrigger>
             <TabsTrigger
               value="trainer"
@@ -260,8 +244,8 @@ export default function Home() {
               disabled={!selectedTask}
             >
               <Dumbbell className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              <span className="hidden sm:inline">Тренажёр</span>
-              <span className="sm:hidden">Тр</span>
+              <span className="hidden sm:inline">{t("tab_trainer")}</span>
+              <span className="sm:hidden">{t("tab_trainer_short")}</span>
             </TabsTrigger>
             <TabsTrigger
               value="results"
@@ -269,32 +253,32 @@ export default function Home() {
               disabled={!evaluationResult}
             >
               <BarChart3 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              <span className="hidden sm:inline">Результаты</span>
-              <span className="sm:hidden">Рез</span>
+              <span className="hidden sm:inline">{t("tab_results")}</span>
+              <span className="sm:hidden">{t("tab_results_short")}</span>
             </TabsTrigger>
             <TabsTrigger
               value="theory"
               className="text-xs sm:text-sm py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white"
             >
               <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              <span className="hidden sm:inline">Теория</span>
-              <span className="sm:hidden">Т</span>
+              <span className="hidden sm:inline">{t("tab_theory")}</span>
+              <span className="sm:hidden">{t("tab_theory_short")}</span>
             </TabsTrigger>
             <TabsTrigger
               value="statistics"
               className="text-xs sm:text-sm py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white"
             >
               <BarChart3 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              <span className="hidden sm:inline">Статистика</span>
-              <span className="sm:hidden">Ст</span>
+              <span className="hidden sm:inline">{t("tab_statistics")}</span>
+              <span className="sm:hidden">{t("tab_statistics_short")}</span>
             </TabsTrigger>
             <TabsTrigger
               value="achievements"
               className="text-xs sm:text-sm py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white"
             >
               <Trophy className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              <span className="hidden sm:inline">Достижения</span>
-              <span className="sm:hidden">Д</span>
+              <span className="hidden sm:inline">{t("tab_achievements")}</span>
+              <span className="sm:hidden">{t("tab_achievements_short")}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -303,9 +287,9 @@ export default function Home() {
             <TabsContent key="tasks" value="tasks">
               <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
                 <div className="mb-4 sm:mb-6">
-                    <h2 className="text-lg sm:text-xl font-semibold mb-1">Выберите задание</h2>
+                    <h2 className="text-lg sm:text-xl font-semibold mb-1">{t("tasks_title")}</h2>
                     <p className="text-sm text-muted-foreground">
-                      Выберите функцию для тестирования. Каждое задание содержит описание, классы эквивалентности и граничные значения.
+                      {t("tasks_subtitle")}
                     </p>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
@@ -313,9 +297,7 @@ export default function Home() {
                       <TaskCard
                         key={task.id}
                         task={task}
-                        isSelected={selectedTask?.id === task.id}
                         bestScore={savedProgress[task.id]?.score}
-                        onClick={() => handleSelectTask(task)}
                       />
                     ))}
                   </div>
@@ -329,12 +311,12 @@ export default function Home() {
                   <div className="flex items-center gap-2 mb-4 sm:mb-6">
                     <Button variant="ghost" size="sm" onClick={handleBackToTasks} className="text-muted-foreground">
                       <ArrowLeft className="h-4 w-4 mr-1" />
-                      Назад
+                      {t("trainer_back")}
                     </Button>
-                    <h2 className="text-lg sm:text-xl font-semibold">Тренажёр: {selectedTask.name}</h2>
+                    <h2 className="text-lg sm:text-xl font-semibold">{t("trainer_title")}: {selectedTask.name}</h2>
                     {savedProgress[selectedTask.id]?.score !== undefined && (
                       <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                        Лучший: {savedProgress[selectedTask.id].score}%
+                        {t("trainer_best")}: {savedProgress[selectedTask.id].score}%
                       </span>
                     )}
                   </div>
@@ -346,7 +328,7 @@ export default function Home() {
                     {/* Right panel - test form and list */}
                     <div className="space-y-4">
                       <TestForm task={selectedTask} onAdd={handleAddTestCase} />
-                      <TestList testCases={testCases} onRemove={handleRemoveTestCase} onSubmit={handleSubmit} onReorder={handleReorderTestCases} />
+                      <TestList testCases={testCases} onRemove={removeTestCase} onSubmit={handleSubmit} onReorder={reorderTestCases} />
                     </div>
                   </div>
                 </motion.div>
@@ -356,13 +338,13 @@ export default function Home() {
               {evaluationResult && (
                 <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
                   <div className="mb-4 sm:mb-6">
-                    <h2 className="text-lg sm:text-xl font-semibold mb-1">Результаты проверки</h2>
+                    <h2 className="text-lg sm:text-xl font-semibold mb-1">{t("results_title")}</h2>
                     <p className="text-sm text-muted-foreground">
-                      Подробная оценка ваших тест-кейсов с покрытием и рекомендациями.
+                      {t("results_subtitle")}
                     </p>
                   </div>
                   <div className="max-w-4xl mx-auto">
-                    <ResultsPanel result={evaluationResult} onReset={handleReset} />
+                    <ResultsPanel />
                   </div>
                 </motion.div>
               )}
@@ -372,9 +354,9 @@ export default function Home() {
             <TabsContent key="theory" value="theory">
               <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
                 <div className="mb-4 sm:mb-6">
-                    <h2 className="text-lg sm:text-xl font-semibold mb-1">Теория тестирования</h2>
+                    <h2 className="text-lg sm:text-xl font-semibold mb-1">{t("theory_title")}</h2>
                     <p className="text-sm text-muted-foreground">
-                      Изучите основные методы тестирования «чёрного ящика» перед выполнением заданий.
+                      {t("theory_subtitle")}
                     </p>
                   </div>
                   <div className="max-w-3xl mx-auto">
@@ -399,7 +381,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t bg-white/50 dark:bg-zinc-900/50 mt-auto">
         <div className="max-w-7xl mx-auto px-4 py-4 text-center text-xs text-muted-foreground">
-          Тренажёр тестирования • Генератор тест-кейсов • Методы чёрного ящика
+          {t("footer_text")}
         </div>
       </footer>
     </div>

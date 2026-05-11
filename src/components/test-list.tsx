@@ -30,13 +30,15 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { TestCase } from "@/lib/evaluator";
-import { categoryColors } from "./test-form";
+import { categoryColors, categoryI18nKeys } from "./test-form";
+import { useLocale } from "@/lib/i18n.client";
+import { useAppStore } from "@/lib/store";
 
 interface TestListProps {
-  testCases: TestCase[];
-  onRemove: (id: string) => void;
-  onSubmit: () => void;
-  onReorder: (reordered: TestCase[]) => void;
+  testCases?: TestCase[];
+  onRemove?: (id: string) => void;
+  onSubmit?: () => void;
+  onReorder?: (reordered: TestCase[]) => void;
 }
 
 function SortableRow({
@@ -48,6 +50,7 @@ function SortableRow({
   idx: number;
   onRemove: (id: string) => void;
 }) {
+  const { t } = useLocale();
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: tc.id });
 
@@ -63,7 +66,7 @@ function SortableRow({
           {...attributes}
           {...listeners}
           className="h-5 w-5 flex items-center justify-center text-muted-foreground hover:text-foreground"
-          aria-label="Перетащить для сортировки"
+          aria-label={t("test_list_drag")}
         >
           <GripVertical className="h-3.5 w-3.5" />
         </button>
@@ -91,7 +94,7 @@ function SortableRow({
           variant="secondary"
           className={`text-[10px] px-1.5 py-0 ${categoryColors[tc.category]}`}
         >
-          {tc.category}
+          {t(categoryI18nKeys[tc.category])}
         </Badge>
       </TableCell>
       <TableCell className="py-2">
@@ -109,12 +112,25 @@ function SortableRow({
 }
 
 export function TestList({
-  testCases,
-  onRemove,
-  onSubmit,
-  onReorder,
+  testCases: testCasesProp,
+  onRemove: onRemoveProp,
+  onSubmit: onSubmitProp,
+  onReorder: onReorderProp,
 }: TestListProps) {
+  const { t } = useLocale();
   const [activeId, setActiveId] = useState<string | null>(null);
+
+  const storeTestCases = useAppStore((s) => s.testCases);
+  const storeRemove = useAppStore((s) => s.removeTestCase);
+  const storeReorder = useAppStore((s) => s.reorderTestCases);
+
+  const testCases = testCasesProp ?? storeTestCases;
+  const onRemove = onRemoveProp ?? storeRemove;
+  const onReorder = onReorderProp ?? storeReorder;
+  const onSubmit = onSubmitProp ?? (() => {
+    // Default submit - just trigger evaluation via custom event
+    window.dispatchEvent(new CustomEvent("test-submit"));
+  });
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -144,10 +160,10 @@ export function TestList({
         <CardContent className="py-10 text-center">
           <AlertCircle className="h-10 w-10 text-muted-foreground/50 mx-auto mb-3" />
           <p className="text-sm text-muted-foreground">
-            Нет добавленных тест-кейсов.
+            {t("test_list_empty")}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            Добавьте хотя бы один тест-кейс для проверки.
+            {t("test_list_empty_hint")}
           </p>
         </CardContent>
       </Card>
@@ -159,7 +175,7 @@ export function TestList({
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-semibold">
-            Тест-кейсы ({testCases.length})
+            {t("test_list_title")} ({testCases.length})
           </CardTitle>
           <Button
             size="sm"
@@ -167,7 +183,7 @@ export function TestList({
             onClick={onSubmit}
           >
             <Send className="h-3.5 w-3.5 mr-1" />
-            Проверить
+            {t("test_list_check")}
           </Button>
         </div>
       </CardHeader>
@@ -184,9 +200,9 @@ export function TestList({
                 <TableRow>
                   <TableHead className="text-xs w-8"></TableHead>
                   <TableHead className="text-xs w-8">#</TableHead>
-                  <TableHead className="text-xs">Вход</TableHead>
-                  <TableHead className="text-xs">Ожидание</TableHead>
-                  <TableHead className="text-xs">Категория</TableHead>
+                  <TableHead className="text-xs">{t("test_list_col_input")}</TableHead>
+                  <TableHead className="text-xs">{t("test_list_col_expected")}</TableHead>
+                  <TableHead className="text-xs">{t("test_list_col_category")}</TableHead>
                   <TableHead className="text-xs w-10"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -214,7 +230,7 @@ export function TestList({
             <kbd className="px-1 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[9px]">Ctrl</kbd>
             {" + "}
             <kbd className="px-1 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[9px]">Enter</kbd>
-            {" — проверить"}
+            {" — "}{t("test_list_shortcut_check")}
           </span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -222,13 +238,13 @@ export function TestList({
             <kbd className="px-1 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[9px]">Ctrl</kbd>
             {" + "}
             <kbd className="px-1 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[9px]">Z</kbd>
-            {" — отменить последний"}
+            {" — "}{t("test_list_shortcut_undo")}
           </span>
         </div>
         <div className="flex items-center gap-1.5">
           <span>
             <kbd className="px-1 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[9px]">Esc</kbd>
-            {" — сбросить всё"}
+            {" — "}{t("test_list_shortcut_reset")}
           </span>
         </div>
       </div>

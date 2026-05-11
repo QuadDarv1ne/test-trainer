@@ -11,6 +11,7 @@ import {
   Lightbulb,
   ShieldCheck,
 } from "lucide-react";
+import { useLocale } from "@/lib/i18n.client";
 
 const fadeIn = {
   initial: { opacity: 0, y: 10 },
@@ -18,6 +19,8 @@ const fadeIn = {
 };
 
 export function TheoryPanel() {
+  const { t } = useLocale();
+
   return (
     <motion.div {...fadeIn} className="space-y-4">
       {/* Introduction */}
@@ -28,16 +31,14 @@ export function TheoryPanel() {
               <BookOpen className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold">Методы тестирования</h2>
+              <h2 className="text-lg font-bold">{t("theory_title")}</h2>
               <p className="text-xs text-muted-foreground">
-                Основы чёрного ящика для генерации тест-кейсов
+                {t("theory_subtitle")}
               </p>
             </div>
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Тестирование по методу «чёрного ящика» (black-box testing) — это подход,
-            при котором тестирование выполняется без знания внутреннего устройства кода.
-            Тестировщик анализирует только входы и ожидаемые выходы функции.
+            {t("theory_intro")}
           </p>
         </CardContent>
       </Card>
@@ -54,9 +55,9 @@ export function TheoryPanel() {
                 <Layers className="h-4 w-4" />
               </div>
               <div className="text-left">
-                <h3 className="font-semibold text-sm">Классы эквивалентности</h3>
+                <h3 className="font-semibold text-sm">{t("theory_ec_title")}</h3>
                 <p className="text-xs text-muted-foreground">
-                  Разделение входных данных на группы
+                  {t("theory_ec_subtitle")}
                 </p>
               </div>
             </div>
@@ -64,27 +65,23 @@ export function TheoryPanel() {
           <AccordionContent className="pb-4">
             <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
               <p>
-                <strong>Классы эквивалентности</strong> — это метод тестирования, при котором
-                входные данные разбиваются на группы (классы), внутри которых поведение
-                функции одинаковое. Достаточно протестировать одно значение из каждого класса.
+                <strong>{t("theory_ec_title")}</strong> — {t("theory_ec_types").toLowerCase()}.
               </p>
               <div className="bg-muted/50 rounded-lg p-3 space-y-2">
                 <p className="font-medium text-foreground text-xs uppercase tracking-wider">
-                  Типы классов
+                  {t("theory_ec_types")}
                 </p>
                 <ul className="space-y-1.5">
                   <li className="flex items-start gap-2">
                     <span className="text-emerald-500 mt-0.5">●</span>
                     <span>
-                      <strong>Валидные классы</strong> — допустимые входные данные, для которых
-                      функция должна работать корректно
+                      <strong>{t("theory_ec_valid")}</strong> — {t("theory_ec_valid_desc")}
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-rose-500 mt-0.5">●</span>
                     <span>
-                      <strong>Невалидные классы</strong> — недопустимые данные, которые должны
-                      вызывать ошибку или исключение
+                      <strong>{t("theory_ec_invalid")}</strong> — {t("theory_ec_invalid_desc")}
                     </span>
                   </li>
                 </ul>
@@ -92,17 +89,17 @@ export function TheoryPanel() {
               <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-3">
                 <p className="font-medium text-emerald-800 dark:text-emerald-300 text-xs mb-1 flex items-center gap-1">
                   <Lightbulb className="h-3.5 w-3.5" />
-                  Пример
+                  {t("theory_ec_example")}
                 </p>
                 <p className="text-xs">
-                  Для функции <code className="font-mono bg-muted px-1 rounded">factorial(n)</code> с условием 0 ≤ n ≤ 20:
+                  {t("theory_ec_example_text")}
                 </p>
                 <ul className="mt-1 space-y-0.5 text-xs">
-                  <li>• n = 0 → отдельный класс (граничный)</li>
-                  <li>• 1 ≤ n ≤ 20 → нормальные значения</li>
-                  <li>• n &lt; 0 → ошибка</li>
-                  <li>• n &gt; 20 → переполнение</li>
-                  <li>• n — не целое число → ошибка типа</li>
+                  <li>• {t("theory_ec_example_list1")}</li>
+                  <li>• {t("theory_ec_example_list2")}</li>
+                  <li>• {t("theory_ec_example_list3")}</li>
+                  <li>• {t("theory_ec_example_list4")}</li>
+                  <li>• {t("theory_ec_example_list5")}</li>
                 </ul>
               </div>
             </div>
@@ -120,9 +117,9 @@ export function TheoryPanel() {
                 <GitBranch className="h-4 w-4" />
               </div>
               <div className="text-left">
-                <h3 className="font-semibold text-sm">Граничные значения</h3>
+                <h3 className="font-semibold text-sm">{t("theory_bv_title")}</h3>
                 <p className="text-xs text-muted-foreground">
-                  Тестирование на границах диапазонов
+                  {t("theory_bv_subtitle")}
                 </p>
               </div>
             </div>
@@ -130,48 +127,46 @@ export function TheoryPanel() {
           <AccordionContent className="pb-4">
             <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
               <p>
-                <strong>Анализ граничных значений</strong> — это метод, основанный на том, что
-                ошибки чаще всего возникают на границах диапазонов допустимых значений.
-                Для каждого диапазона тестируются значения на границах и рядом с ними.
+                <strong>{t("theory_bv_title")}</strong> — {t("theory_bv_rules").toLowerCase()}.
               </p>
               <div className="bg-muted/50 rounded-lg p-3 space-y-2">
                 <p className="font-medium text-foreground text-xs uppercase tracking-wider">
-                  Правила выбора граничных значений
+                  {t("theory_bv_rules")}
                 </p>
                 <ul className="space-y-1.5">
                   <li className="flex items-start gap-2">
                     <span className="text-amber-500 mt-0.5">●</span>
-                    <span>Минимальное и максимальное допустимое значение</span>
+                    <span>{t("theory_bv_rule1")}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-amber-500 mt-0.5">●</span>
-                    <span>Значение «чуть ниже» минимума и «чуть выше» максимума</span>
+                    <span>{t("theory_bv_rule2")}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-amber-500 mt-0.5">●</span>
-                    <span>Особые точки: ноль, пустая строка, null</span>
+                    <span>{t("theory_bv_rule3")}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-amber-500 mt-0.5">●</span>
-                    <span>Точки перехода между логическими условиями</span>
+                    <span>{t("theory_bv_rule4")}</span>
                   </li>
                 </ul>
               </div>
               <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3">
                 <p className="font-medium text-amber-800 dark:text-amber-300 text-xs mb-1 flex items-center gap-1">
                   <Lightbulb className="h-3.5 w-3.5" />
-                  Пример
+                  {t("theory_ec_example")}
                 </p>
                 <p className="text-xs">
-                  Для диапазона 1 ≤ n ≤ 10:
+                  {t("theory_bv_example_text")}
                 </p>
                 <div className="flex gap-2 mt-1 text-xs flex-wrap">
-                  <code className="bg-white dark:bg-muted px-1.5 py-0.5 rounded font-mono border border-rose-200 dark:border-rose-800 text-rose-700">0 (недо)</code>
-                  <code className="bg-white dark:bg-muted px-1.5 py-0.5 rounded font-mono border border-emerald-200 dark:border-emerald-800 text-emerald-700">1 (min)</code>
-                  <code className="bg-white dark:bg-muted px-1.5 py-0.5 rounded font-mono border border-emerald-200 dark:border-emerald-800 text-emerald-700">2 (min+1)</code>
-                  <code className="bg-white dark:bg-muted px-1.5 py-0.5 rounded font-mono border border-emerald-200 dark:border-emerald-800 text-emerald-700">9 (max-1)</code>
-                  <code className="bg-white dark:bg-muted px-1.5 py-0.5 rounded font-mono border border-emerald-200 dark:border-emerald-800 text-emerald-700">10 (max)</code>
-                  <code className="bg-white dark:bg-muted px-1.5 py-0.5 rounded font-mono border border-rose-200 dark:border-rose-800 text-rose-700">11 (сверх)</code>
+                  <code className="bg-white dark:bg-muted px-1.5 py-0.5 rounded font-mono border border-rose-200 dark:border-rose-800 text-rose-700">0 ({t("theory_bv_below_min")})</code>
+                  <code className="bg-white dark:bg-muted px-1.5 py-0.5 rounded font-mono border border-emerald-200 dark:border-emerald-800 text-emerald-700">1 ({t("theory_bv_min")})</code>
+                  <code className="bg-white dark:bg-muted px-1.5 py-0.5 rounded font-mono border border-emerald-200 dark:border-emerald-800 text-emerald-700">2 ({t("theory_bv_min_plus")})</code>
+                  <code className="bg-white dark:bg-muted px-1.5 py-0.5 rounded font-mono border border-emerald-200 dark:border-emerald-800 text-emerald-700">9 ({t("theory_bv_max_minus")})</code>
+                  <code className="bg-white dark:bg-muted px-1.5 py-0.5 rounded font-mono border border-emerald-200 dark:border-emerald-800 text-emerald-700">10 ({t("theory_bv_max")})</code>
+                  <code className="bg-white dark:bg-muted px-1.5 py-0.5 rounded font-mono border border-rose-200 dark:border-rose-800 text-rose-700">11 ({t("theory_bv_above_max")})</code>
                 </div>
               </div>
             </div>
@@ -189,9 +184,9 @@ export function TheoryPanel() {
                 <ArrowRightLeft className="h-4 w-4" />
               </div>
               <div className="text-left">
-                <h3 className="font-semibold text-sm">Категории тест-кейсов</h3>
+                <h3 className="font-semibold text-sm">{t("theory_categories_title")}</h3>
                 <p className="text-xs text-muted-foreground">
-                  Как классифицировать тесты
+                  {t("theory_categories_subtitle")}
                 </p>
               </div>
             </div>
@@ -201,38 +196,34 @@ export function TheoryPanel() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-3">
                   <p className="font-medium text-emerald-800 dark:text-emerald-300 text-xs mb-1">
-                    🟢 Нормальное значение
+                    🟢 {t("theory_cat_normal")}
                   </p>
                   <p className="text-xs">
-                    Обычные входные данные, находящиеся в допустимом диапазоне.
-                    Функция должна корректно обработать и вернуть ожидаемый результат.
+                    {t("theory_cat_normal_desc")}
                   </p>
                 </div>
                 <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3">
                   <p className="font-medium text-amber-800 dark:text-amber-300 text-xs mb-1">
-                    🟡 Граничное значение
+                    🟡 {t("theory_cat_boundary")}
                   </p>
                   <p className="text-xs">
-                    Значения на границах диапазонов: минимум, максимум, переходные точки.
-                    Здесь наиболее вероятны ошибки.
+                    {t("theory_cat_boundary_desc")}
                   </p>
                 </div>
                 <div className="bg-rose-50 dark:bg-rose-900/20 rounded-lg p-3">
                   <p className="font-medium text-rose-800 dark:text-rose-300 text-xs mb-1">
-                    🔴 Исключение
+                    🔴 {t("theory_cat_exception")}
                   </p>
                   <p className="text-xs">
-                    Входные данные, которые вызывают ошибку или исключение.
-                    Проверяется корректная обработка неверных данных.
+                    {t("theory_cat_exception_desc")}
                   </p>
                 </div>
                 <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3">
                   <p className="font-medium text-purple-800 dark:text-purple-300 text-xs mb-1">
-                    🟣 Недопустимый тип
+                    🟣 {t("theory_cat_invalid")}
                   </p>
                   <p className="text-xs">
-                    Данные неверного типа: строка вместо числа, null вместо объекта и т.д.
-                    Проверяется валидация входных данных.
+                    {t("theory_cat_invalid_desc")}
                   </p>
                 </div>
               </div>
@@ -251,9 +242,9 @@ export function TheoryPanel() {
                 <ShieldCheck className="h-4 w-4" />
               </div>
               <div className="text-left">
-                <h3 className="font-semibold text-sm">Советы</h3>
+                <h3 className="font-semibold text-sm">{t("theory_tips_title")}</h3>
                 <p className="text-xs text-muted-foreground">
-                  Лучшие практики тестирования
+                  {t("theory_tips_subtitle")}
                 </p>
               </div>
             </div>
@@ -264,36 +255,31 @@ export function TheoryPanel() {
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-500 mt-0.5 shrink-0">1.</span>
                   <span>
-                    <strong>Покройте все классы эквивалентности</strong> — для каждого класса
-                    создайте хотя бы один тест-кейс
+                    <strong>{t("theory_tip1").split("—")[0]}</strong>—{t("theory_tip1").split("—")[1]}
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-500 mt-0.5 shrink-0">2.</span>
                   <span>
-                    <strong>Не забывайте о граничных значениях</strong> — тестируйте границы и
-                    значения рядом с ними
+                    <strong>{t("theory_tip2").split("—")[0]}</strong>—{t("theory_tip2").split("—")[1]}
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-500 mt-0.5 shrink-0">3.</span>
                   <span>
-                    <strong>Тестируйте невалидные данные</strong> — проверьте, как функция
-                    обрабатывает ошибки
+                    <strong>{t("theory_tip3").split("—")[0]}</strong>—{t("theory_tip3").split("—")[1]}
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-500 mt-0.5 shrink-0">4.</span>
                   <span>
-                    <strong>Проверяйте типы</strong> — передайте данные неверного типа и
-                    убедитесь, что функция корректно обработает это
+                    <strong>{t("theory_tip4").split("—")[0]}</strong>—{t("theory_tip4").split("—")[1]}
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-500 mt-0.5 shrink-0">5.</span>
                   <span>
-                    <strong>Используйте осмысленные комментарии</strong> — записывайте, почему
-                    выбран конкретный тест-кейс
+                    <strong>{t("theory_tip5").split("—")[0]}</strong>—{t("theory_tip5").split("—")[1]}
                   </span>
                 </li>
               </ul>

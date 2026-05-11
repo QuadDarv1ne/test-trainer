@@ -116,14 +116,14 @@ function validatePassword(
 // Map of reference functions
 export const referenceFunctions: Record<
   number,
-  (...args: unknown[]) => unknown
+  (args: unknown[]) => unknown
 > = {
-  1: (args) => factorial(args[0] as number),
-  2: (args) => isPrime(args[0] as number),
-  3: (args) => applyDiscount(args[0] as number, args[1] as number),
-  4: (args) => isLeapYear(args[0] as number),
-  5: (args) => triangleType(args[0] as number, args[1] as number, args[2] as number),
-  6: (args) => validatePassword(args[0] as string),
+  1: (args: unknown[]) => factorial(args[0] as number),
+  2: (args: unknown[]) => isPrime(args[0] as number),
+  3: (args: unknown[]) => applyDiscount(args[0] as number, args[1] as number),
+  4: (args: unknown[]) => isLeapYear(args[0] as number),
+  5: (args: unknown[]) => triangleType(args[0] as number, args[1] as number, args[2] as number),
+  6: (args: unknown[]) => validatePassword(args[0] as string),
 };
 
 export const tasks: Task[] = [
@@ -132,7 +132,7 @@ export const tasks: Task[] = [
     name: "Факториал",
     difficulty: "Легко",
     description:
-      "Вычисляет факториал целого неотрицательного числа n. Факториал нуля равен 1, для чисел больше 20 происходит переполнение.",
+      "Вычисляет **факториал** целого неотрицательного числа `n`. Факториал нуля равен `1`, для чисел больше `20` происходит переполнение.",
     signature: "factorial(n: number): number",
     topics: ["Классы эквивалентности", "Граничные значения"],
     params: [
@@ -194,7 +194,7 @@ export const tasks: Task[] = [
     name: "Простое число",
     difficulty: "Средне",
     description:
-      "Проверяет, является ли целое число n простым. Простое число — это натуральное число больше 1, которое делится только на 1 и на себя.",
+      "Проверяет, является ли целое число `n` **простым**. Простое число — это натуральное число больше `1`, которое делится только на `1` и на себя.",
     signature: "isPrime(n: number): boolean",
     topics: ["Классы эквивалентности", "Граничные значения", "Нелинейные классы"],
     params: [
@@ -262,7 +262,7 @@ export const tasks: Task[] = [
     name: "Калькулятор скидки",
     difficulty: "Средне",
     description:
-      "Применяет скидку к цене. Принимает цену и процент скидки, возвращает итоговую сумму со скидкой. Скидка округляется до 2 знаков.",
+      "Применяет **скидку** к цене. Принимает цену и процент скидки, возвращает итоговую сумму со скидкой. Скидка округляется до 2 знаков.",
     signature: "applyDiscount(price: number, discountPercent: number): number",
     topics: [
       "Классы эквивалентности",
@@ -351,7 +351,7 @@ export const tasks: Task[] = [
     name: "Високосный год",
     difficulty: "Легко",
     description:
-      "Проверяет, является ли год високосным. Год високосный, если он делится на 4, но не на 100, за исключением годов, делящихся на 400.",
+      "Проверяет, является ли год **високосным**. Год високосный, если он делится на `4`, но не на `100`, за исключением годов, делящихся на `400`.",
     signature: "isLeapYear(year: number): boolean",
     topics: ["Классы эквивалентности", "Граничные значения", "Логические условия"],
     params: [
@@ -416,7 +416,7 @@ export const tasks: Task[] = [
     name: "Треугольник",
     difficulty: "Сложно",
     description:
-      "Определяет тип треугольника по трём сторонам. Возвращает «равносторонний», «равнобедренный», «разносторонний» или «не треугольник».",
+      "Определяет **тип треугольника** по трём сторонам. Возвращает `«равносторонний»`, `«равнобедренный»`, `«разносторонний»` или `«не треугольник»`.",
     signature: "triangleType(a: number, b: number, c: number): string",
     topics: [
       "Классы эквивалентности",
@@ -494,7 +494,7 @@ export const tasks: Task[] = [
     name: "Валидация пароля",
     difficulty: "Сложно",
     description:
-      "Проверяет пароль на соответствие требованиям безопасности: минимум 8 символов, хотя бы одна заглавная и одна строчная буква, хотя бы одна цифра и один спецсимвол.",
+      "Проверяет пароль на соответствие **требованиям безопасности**:\n\n- Минимум `8` символов\n- Хотя бы одна **заглавная** буква\n- Хотя бы одна **строчная** буква\n- Хотя бы одна **цифра**\n- Хотя бы один **спецсимвол**",
     signature:
       "validatePassword(password: string): { valid: boolean; errors: string[] }",
     topics: [

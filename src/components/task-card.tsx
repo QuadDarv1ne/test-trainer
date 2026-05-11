@@ -13,6 +13,9 @@ import {
   Triangle,
   Lock,
 } from "lucide-react";
+import { useLocale } from "@/lib/i18n.client";
+import { useAppStore } from "@/lib/store";
+import ReactMarkdown from "react-markdown";
 
 const taskIcons: Record<number, React.ReactNode> = {
   1: <FunctionSquare className="h-5 w-5" />,
@@ -23,20 +26,35 @@ const taskIcons: Record<number, React.ReactNode> = {
   6: <Lock className="h-5 w-5" />,
 };
 
-const difficultyColors: Record<string, string> = {
-  Легко: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
-  Средне: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
-  Сложно: "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400",
-};
-
 interface TaskCardProps {
   task: Task;
-  isSelected: boolean;
+  isSelected?: boolean;
   bestScore?: number;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
-export function TaskCard({ task, isSelected, bestScore, onClick }: TaskCardProps) {
+export function TaskCard({ task, isSelected: isSelectedProp, bestScore, onClick }: TaskCardProps) {
+  const { t } = useLocale();
+  const selectedTask = useAppStore((s) => s.selectedTask);
+  const setSelectedTask = useAppStore((s) => s.setSelectedTask);
+
+  const isSelected = isSelectedProp ?? selectedTask?.id === task.id;
+  const handleClick = onClick ?? (() => setSelectedTask(task));
+
+  const difficultyLabel =
+    task.difficulty === "Легко"
+      ? t("difficulty_easy")
+      : task.difficulty === "Средне"
+        ? t("difficulty_medium")
+        : t("difficulty_hard");
+
+  const difficultyColor =
+    task.difficulty === "Легко"
+      ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
+      : task.difficulty === "Средне"
+        ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
+        : "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400";
+
   return (
     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
       <Card
@@ -45,7 +63,7 @@ export function TaskCard({ task, isSelected, bestScore, onClick }: TaskCardProps
             ? "ring-2 ring-emerald-500 shadow-lg shadow-emerald-500/20"
             : "hover:shadow-md hover:ring-1 hover:ring-emerald-300"
         }`}
-        onClick={onClick}
+        onClick={handleClick}
       >
         <CardContent className="p-4">
           <div className="flex items-start justify-between gap-2 mb-3">
@@ -65,9 +83,9 @@ export function TaskCard({ task, isSelected, bestScore, onClick }: TaskCardProps
             <div className="flex flex-col items-end gap-1">
               <Badge
                 variant="secondary"
-                className={difficultyColors[task.difficulty]}
+                className={difficultyColor}
               >
-                {task.difficulty}
+                {difficultyLabel}
               </Badge>
               {bestScore !== undefined && bestScore > 0 && (
                 <Badge className="bg-amber-100 text-amber-800 text-[10px] dark:bg-amber-900/30 dark:text-amber-400">
@@ -78,20 +96,53 @@ export function TaskCard({ task, isSelected, bestScore, onClick }: TaskCardProps
             </div>
           </div>
 
-          <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+          <ReactMarkdown
+            components={{
+              p: ({ children }) => (
+                <p className="text-xs text-muted-foreground leading-relaxed mb-3">{children}</p>
+              ),
+              code: ({ children }) => (
+                <code className="bg-muted px-1 py-0.5 rounded text-[10px] font-mono">{children}</code>
+              ),
+              strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+              ul: () => null, // Skip lists in card view
+              ol: () => null,
+              li: () => null,
+            }}
+          >
             {task.description}
-          </p>
+          </ReactMarkdown>
 
           <div className="flex flex-wrap gap-1">
-            {task.topics.map((topic) => (
-              <Badge
-                key={topic}
-                variant="outline"
-                className="text-[10px] px-1.5 py-0"
-              >
-                {topic}
-              </Badge>
-            ))}
+            {task.topics.map((topic) => {
+              const topicKey = `topic_${topic.toLowerCase().replace(/[^a-zа-яё]/gi, "_").replace(/_+/g, "_").replace(/^_|_$/g, "")}`;
+              // Map Russian topic names to i18n keys
+              const topicTranslation =
+                topic === "Классы эквивалентности"
+                  ? t("topic_ec")
+                  : topic === "Граничные значения"
+                    ? t("topic_bv")
+                    : topic === "Нелинейные классы"
+                      ? t("topic_nonlinear")
+                      : topic === "Многофакторное тестирование"
+                        ? t("topic_multi")
+                        : topic === "Логические условия"
+                          ? t("topic_logic")
+                          : topic === "Комбинаторное тестирование"
+                            ? t("topic_combinatorial")
+                            : topic === "Проверка форматов"
+                              ? t("topic_formats")
+                              : topic;
+              return (
+                <Badge
+                  key={topic}
+                  variant="outline"
+                  className="text-[10px] px-1.5 py-0"
+                >
+                  {topicTranslation}
+                </Badge>
+              );
+            })}
           </div>
         </CardContent>
       </Card>

@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Flame, Trash2 } from "lucide-react";
 import { tasks } from "@/lib/tasks";
-import type { AttemptRecord, StreakData } from "@/lib/storage";
-import { loadStreak, loadAttempts, clearAllProgress } from "@/lib/storage";
+import { loadStreak, loadAttempts, type StreakData } from "@/lib/storage";
+import { useAppStore } from "@/lib/store";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -28,9 +28,11 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { format } from "date-fns";
-import { ru } from "date-fns/locale";
+import { ru, enUS } from "date-fns/locale";
+import { useLocale } from "@/lib/i18n.client";
 
 export function StatisticsPanel() {
+  const { t, locale } = useLocale();
   const [streak] = useState<StreakData>(() => loadStreak());
   const attempts = loadAttempts();
   const totalAttempts = attempts.length;
@@ -45,18 +47,20 @@ export function StatisticsPanel() {
   }).length;
 
   const handleReset = () => {
-    clearAllProgress();
-    toast.success("Прогресс сброшен");
+    useAppStore.getState().clearAllProgress();
+    toast.success(t("toast_progress_reset"));
     // Reload page to refresh state
     window.location.reload();
   };
 
+  const dateLocale = locale === "ru" ? ru : enUS;
+
   return (
     <div className="space-y-4">
       <div className="text-center mb-4">
-        <h2 className="text-lg sm:text-xl font-semibold mb-1">Статистика</h2>
+        <h2 className="text-lg sm:text-xl font-semibold mb-1">{t("stats_title")}</h2>
         <p className="text-sm text-muted-foreground">
-          История ваших попыток и прогресс по заданиям
+          {t("stats_subtitle")}
         </p>
       </div>
 
@@ -68,12 +72,12 @@ export function StatisticsPanel() {
             {streak.currentStreak}
           </span>
           <span className="text-xs text-orange-600 dark:text-orange-400">
-            дн. подряд
+            {t("stats_days_row")}
           </span>
         </div>
         {streak.longestStreak > 0 && (
           <span className="text-xs text-muted-foreground">
-            Рекорд: {streak.longestStreak} дн.
+            {t("stats_record")}: {streak.longestStreak}
           </span>
         )}
       </div>
@@ -82,14 +86,14 @@ export function StatisticsPanel() {
       {attempts.length > 0 && (
         <Card>
           <CardContent className="pt-6">
-            <h3 className="text-sm font-semibold mb-3">Прогресс баллов</h3>
+            <h3 className="text-sm font-semibold mb-3">{t("stats_score_progress")}</h3>
             <ResponsiveContainer width="100%" height={200}>
               <LineChart
                 data={attempts.slice(-20).map((a, i) => ({
                   index: i + 1,
                   score: a.score,
-                  date: format(new Date(a.timestamp), "dd MMM HH:mm", { locale: ru }),
-                  task: tasks.find((t) => t.id === a.taskId)?.name ?? `#${a.taskId}`,
+                  date: format(new Date(a.timestamp), "dd MMM HH:mm", { locale: dateLocale }),
+                  task: tasks.find((tk) => tk.id === a.taskId)?.name ?? `#${a.taskId}`,
                 }))}
                 margin={{ top: 5, right: 10, left: -20, bottom: 5 }}
               >
@@ -97,10 +101,10 @@ export function StatisticsPanel() {
                 <XAxis dataKey="index" className="text-xs" tick={{ fontSize: 10 }} />
                 <YAxis domain={[0, 100]} className="text-xs" tick={{ fontSize: 10 }} />
                 <Tooltip
-                  formatter={(value: number) => [`${value}%`, "Балл"]}
+                  formatter={(value: number) => [`${value}%`, t("results_metric_score")]}
                   labelFormatter={(_, payload) => {
                     const item = payload?.[0]?.payload;
-                    return item ? `${item.task} — ${item.date}` : `Попытка ${_ + 1}`;
+                    return item ? `${item.task} — ${item.date}` : `${t("stats_attempts")} ${_ + 1}`;
                   }}
                   contentStyle={{ fontSize: 12 }}
                 />
@@ -121,17 +125,17 @@ export function StatisticsPanel() {
       <div className="grid grid-cols-3 gap-4 text-center">
         <div>
           <p className="text-2xl font-bold text-emerald-600">{totalAttempts}</p>
-          <p className="text-xs text-muted-foreground">Попыток</p>
+          <p className="text-xs text-muted-foreground">{t("stats_attempts")}</p>
         </div>
         <div>
           <p className="text-2xl font-bold text-teal-600">{avgOverallScore}%</p>
-          <p className="text-xs text-muted-foreground">Средний балл</p>
+          <p className="text-xs text-muted-foreground">{t("stats_avg_score")}</p>
         </div>
         <div>
           <p className="text-2xl font-bold text-amber-600">
-            {completedWithExcellent}/{tasks.length} задач
+            {completedWithExcellent}/{tasks.length} {t("stats_tasks_completed")}
           </p>
-          <p className="text-xs text-muted-foreground">Отлично</p>
+          <p className="text-xs text-muted-foreground">{t("stats_excellent")}</p>
         </div>
       </div>
 
@@ -141,20 +145,19 @@ export function StatisticsPanel() {
           <AlertDialogTrigger asChild>
             <button className="text-xs text-muted-foreground hover:text-destructive flex items-center gap-1 transition-colors">
               <Trash2 className="h-3 w-3" />
-              Сбросить прогресс
+              {t("stats_reset")}
             </button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Сбросить весь прогресс?</AlertDialogTitle>
+              <AlertDialogTitle>{t("stats_reset_title")}</AlertDialogTitle>
               <AlertDialogDescription>
-                Это действие удалит все ваши результаты, статистику и достижения.
-                Действие нельзя отменить.
+                {t("stats_reset_desc")}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Отмена</AlertDialogCancel>
-              <AlertDialogAction onClick={handleReset}>Сбросить</AlertDialogAction>
+              <AlertDialogCancel>{t("stats_reset_cancel")}</AlertDialogCancel>
+              <AlertDialogAction onClick={handleReset}>{t("stats_reset_confirm")}</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

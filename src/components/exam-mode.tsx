@@ -40,7 +40,7 @@ export function ExamMode() {
   const [examExpected, setExamExpected] = useState("");
   const [examCategory, setExamCategory] = useState<string>("Нормальное значение");
   const [showConfetti, setShowConfetti] = useState(false);
-  const finishExamRef = useRef<() => void>();
+  const finishExamRef = useRef<() => void>(null);
 
   const completedCount = examResults.length;
 
