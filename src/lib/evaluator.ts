@@ -280,8 +280,8 @@ function findCoveredEquivalenceClasses(
         result === "не треугольник" &&
         !error
       ) {
-        const [a, b, c] = inputs as number[];
-        if (a + b === c || a + c === b || b + c === a)
+        const [a, b, c] = inputs;
+        if (typeof a === "number" && typeof b === "number" && typeof c === "number" && (a + b === c || a + c === b || b + c === a))
           covered.push(ec.id);
       }
     }
@@ -425,7 +425,7 @@ function findCoveredEquivalenceClasses(
       if (ec.id === "ec6" && !error && Array.isArray(inputs[0]) && new Set(inputs[0]).size < (inputs[0] as number[]).length) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec7" && error && Array.isArray(inputs[0]) && (inputs[0] as unknown[]).some(v => typeof v === "number" && isNaN(v))) {
+      if (ec.id === "ec7" && error && Array.isArray(inputs[0]) && (inputs[0] as number[]).some(v => typeof v === "number" && isNaN(v))) {
         covered.push(ec.id);
       }
       if (ec.id === "ec8" && error && !Array.isArray(inputs[0])) {
@@ -508,15 +508,13 @@ function compareOutputs(expected: string, actual: unknown): boolean {
 
   // Handle "Error:" prefix matching better
   if (normalizedExpected.includes("ошибк") || normalizedExpected.includes("исключен") || normalizedExpected.startsWith("error:")) {
-    // Strip "Error:" prefix if present and compare message content
-    let strippedExpected = normalizedExpected;
-    if (strippedExpected.startsWith("error:")) {
-      strippedExpected = strippedExpected.slice(6).trim();
-    }
-    let strippedActual = normalizedActual;
-    if (strippedActual.startsWith("ошибка:")) {
-      strippedActual = strippedActual.slice(7).trim();
-    }
+    // Strip error prefixes from both expected and actual for comparison
+    let strippedExpected = normalizedExpected
+      .replace(/^error:\s*/i, "")
+      .replace(/^ошибка:\s*/, "");
+    let strippedActual = normalizedActual
+      .replace(/^error:\s*/i, "")
+      .replace(/^ошибка:\s*/, "");
     if (strippedActual.includes(strippedExpected) || strippedExpected.includes(strippedActual)) {
       return true;
     }

@@ -229,6 +229,23 @@ export const translations: Record<Locale, Record<string, string>> = {
     exam_add_test_case: "Тест-кейс добавлен",
     exam_add_at_least_one: "Добавьте хотя бы один тест-кейс",
     exam_task_checked: "Задание «{name}» проверено! Оценка: {score}%",
+    results_no_results: "Запустите проверку тест-кейсов, чтобы увидеть результаты",
+    trainer_select_task: "Выберите задание, чтобы начать работу",
+
+    // Onboarding
+    onboarding_step1_title: "Добро пожаловать!",
+    onboarding_step1_desc: "Тренажёр тестирования поможет вам освоить методы чёрного ящика на практике. Вы будете создавать тест-кейсы для реальных функций и получать мгновенную обратную связь.",
+    onboarding_step2_title: "Выберите задание",
+    onboarding_step2_desc: "Начните с выбора функции из списка заданий. Каждое задание содержит описание, классы эквивалентности и граничные значения, которые нужно покрыть.",
+    onboarding_step3_title: "Создавайте тесты",
+    onboarding_step3_desc: "Добавляйте тест-кейсы с входными значениями и ожидаемым результатом. Используйте кнопку «Подсказка», если застряли. Нажмите «Проверить» для оценки.",
+    onboarding_step4_title: "Анализируйте результаты",
+    onboarding_step4_desc: "Получите детальную оценку по трём критериям: покрытие классов эквивалентности (40%), граничных значений (30%) и корректность ожиданий (30%).",
+    onboarding_step5_title: "Учитесь и растите",
+    onboarding_step5_desc: "Раздел «Теория» содержит пояснения методов тестирования. Раздел «Статистика» отслеживает ваш прогресс. Попробуйте «Режим экзамена» для вызова!",
+    onboarding_skip: "Пропустить",
+    onboarding_start: "Начать",
+    onboarding_next: "Далее",
 
     // Hints
     hint_next: "Следующая подсказка",
@@ -522,6 +539,23 @@ export const translations: Record<Locale, Record<string, string>> = {
     exam_add_test_case: "Test case added",
     exam_add_at_least_one: "Add at least one test case",
     exam_task_checked: "Task \"{name}\" checked! Score: {score}%",
+    results_no_results: "Run test case checks to see results",
+    trainer_select_task: "Select a task to get started",
+
+    // Onboarding
+    onboarding_step1_title: "Welcome!",
+    onboarding_step1_desc: "The testing trainer will help you master black-box testing methods in practice. You'll create test cases for real functions and get instant feedback.",
+    onboarding_step2_title: "Choose a Task",
+    onboarding_step2_desc: "Start by selecting a function from the task list. Each task includes a description, equivalence classes, and boundary values to cover.",
+    onboarding_step3_title: "Create Tests",
+    onboarding_step3_desc: "Add test cases with input values and expected results. Use the Hint button if you get stuck. Click Check for evaluation.",
+    onboarding_step4_title: "Analyze Results",
+    onboarding_step4_desc: "Get a detailed score across three criteria: equivalence class coverage (40%), boundary value coverage (30%), and expectation correctness (30%).",
+    onboarding_step5_title: "Learn and Grow",
+    onboarding_step5_desc: "The Theory section explains testing methods. Statistics tracks your progress. Try Exam Mode for a challenge!",
+    onboarding_skip: "Skip",
+    onboarding_start: "Start",
+    onboarding_next: "Next",
 
     // Hints
     hint_next: "Next Hint",

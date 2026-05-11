@@ -18,43 +18,44 @@ import {
   BarChart3,
   BookOpen,
 } from "lucide-react";
+import { useLocale } from "@/lib/i18n.client";
 
 const ONBOARDING_KEY = "test-trainer-onboarding-done";
 
-const steps = [
-  {
-    icon: <Sparkles className="h-8 w-8 text-emerald-600" />,
-    title: "Добро пожаловать!",
-    description:
-      "Тренажёр тестирования поможет вам освоить методы чёрного ящика на практике. Вы будете создавать тест-кейсы для реальных функций и получать мгновенную обратную связь.",
-  },
-  {
-    icon: <ListChecks className="h-8 w-8 text-teal-600" />,
-    title: "Выберите задание",
-    description:
-      "Начните с выбора функции из списка заданий. Каждое задание содержит описание, классы эквивалентности и граничные значения, которые нужно покрыть.",
-  },
-  {
-    icon: <Dumbbell className="h-8 w-8 text-amber-600" />,
-    title: "Создавайте тесты",
-    description:
-      "Добавляйте тест-кейсы с входными значениями и ожидаемым результатом. Используйте кнопку «Подсказка», если застряли. Нажмите «Проверить» для оценки.",
-  },
-  {
-    icon: <BarChart3 className="h-8 w-8 text-purple-600" />,
-    title: "Анализируйте результаты",
-    description:
-      "Получите детальную оценку по трём критериям: покрытие классов эквивалентности (40%), граничных значений (30%) и корректность ожиданий (30%).",
-  },
-  {
-    icon: <BookOpen className="h-8 w-8 text-blue-600" />,
-    title: "Учитесь и растите",
-    description:
-      "Раздел «Теория» содержит пояснения методов тестирования. Раздел «Статистика» отслеживает ваш прогресс. Попробуйте «Режим экзамена» для вызова!",
-  },
-];
+function useOnboardingSteps() {
+  const { t } = useLocale();
+  return [
+    {
+      icon: <Sparkles className="h-8 w-8 text-emerald-600" />,
+      title: t("onboarding_step1_title"),
+      description: t("onboarding_step1_desc"),
+    },
+    {
+      icon: <ListChecks className="h-8 w-8 text-teal-600" />,
+      title: t("onboarding_step2_title"),
+      description: t("onboarding_step2_desc"),
+    },
+    {
+      icon: <Dumbbell className="h-8 w-8 text-amber-600" />,
+      title: t("onboarding_step3_title"),
+      description: t("onboarding_step3_desc"),
+    },
+    {
+      icon: <BarChart3 className="h-8 w-8 text-purple-600" />,
+      title: t("onboarding_step4_title"),
+      description: t("onboarding_step4_desc"),
+    },
+    {
+      icon: <BookOpen className="h-8 w-8 text-blue-600" />,
+      title: t("onboarding_step5_title"),
+      description: t("onboarding_step5_desc"),
+    },
+  ];
+}
 
 export function Onboarding() {
+  const { t } = useLocale();
+  const steps = useOnboardingSteps();
   const [open, setOpen] = useState(() => {
     try {
       return !localStorage.getItem(ONBOARDING_KEY);
@@ -122,13 +123,13 @@ export function Onboarding() {
             </div>
             <div className="flex gap-2 mt-2">
               <Button variant="ghost" className="flex-1" onClick={handleSkip}>
-                Пропустить
+                {t("onboarding_skip")}
               </Button>
               <Button
                 className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
                 onClick={handleNext}
               >
-                {isLast ? "Начать" : "Далее"}
+                {isLast ? t("onboarding_start") : t("onboarding_next")}
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>

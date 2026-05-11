@@ -11,8 +11,6 @@ export function ResultsTab() {
   const { t } = useLocale();
   const evaluationResult = useAppStore((s) => s.evaluationResult);
 
-  if (!evaluationResult) return null;
-
   return (
     <TabsContent key="results" value="results">
       <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
@@ -22,9 +20,15 @@ export function ResultsTab() {
             {t("results_subtitle")}
           </p>
         </div>
-        <div className="max-w-4xl mx-auto">
-          <ResultsPanel />
-        </div>
+        {evaluationResult ? (
+          <div className="max-w-4xl mx-auto">
+            <ResultsPanel />
+          </div>
+        ) : (
+          <div className="text-center py-12 text-muted-foreground">
+            <p>{t("results_no_results")}</p>
+          </div>
+        )}
       </motion.div>
     </TabsContent>
   );
