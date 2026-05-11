@@ -26,14 +26,14 @@ export function ProgressBar() {
           </span>
         </div>
         <span className="text-xs text-muted-foreground">
-          {Math.round((completedCount / totalTasks) * 100)}%
+          {totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0}%
         </span>
       </div>
       <div className="h-2 rounded-full bg-muted overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-500 ease-out"
           style={{
-            width: `${(completedCount / totalTasks) * 100}%`,
+            width: `${totalTasks > 0 ? (completedCount / totalTasks) * 100 : 0}%`,
             background:
               completedCount >= totalTasks - 1
                 ? "linear-gradient(to right, #10b981, #059669)"

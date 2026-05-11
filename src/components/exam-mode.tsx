@@ -113,7 +113,8 @@ export function ExamMode() {
     }
     // Shuffle selected tasks
     const shuffled = selectedTasks
-      .map((id) => tasks.find((t) => t.id === id)!)
+      .map((id) => tasks.find((t) => t.id === id))
+      .filter((task): task is NonNullable<typeof task> => task !== undefined)
       .sort(() => Math.random() - 0.5);
     setExamTasks(shuffled);
     setExamTestCases({});
