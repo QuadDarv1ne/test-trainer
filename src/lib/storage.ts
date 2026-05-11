@@ -1,4 +1,5 @@
 import type { TestCase } from "./evaluator";
+import { toast } from "sonner";
 
 const PROGRESS_KEY = "test-trainer-progress";
 const SESSION_PREFIX = "test-trainer-session-";
@@ -43,8 +44,10 @@ export function saveProgress(
       progress[taskId] = { score, testCases };
       localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
     }
-  } catch {
-    // localStorage недоступен
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "QuotaExceededError") {
+      toast.error("Хранилище браузера заполнено. Очистите данные сайта.");
+    }
   }
 }
 
@@ -70,8 +73,10 @@ export function saveCurrentSession(
 ): void {
   try {
     localStorage.setItem(SESSION_PREFIX + taskId, JSON.stringify(testCases));
-  } catch {
-    // localStorage недоступен
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "QuotaExceededError") {
+      toast.error("Хранилище браузера заполнено. Очистите данные сайта.");
+    }
   }
 }
 
@@ -99,8 +104,10 @@ export function saveAttempt(record: AttemptRecord): void {
 
     // Обновляем streak
     updateStreak(record.timestamp);
-  } catch {
-    // ignore
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "QuotaExceededError") {
+      toast.error("Хранилище браузера заполнено. Очистите данные сайта.");
+    }
   }
 }
 
@@ -172,8 +179,10 @@ function updateStreak(timestamp: number): void {
 export function saveStreak(streak: StreakData): void {
   try {
     localStorage.setItem(STREAK_KEY, JSON.stringify(streak));
-  } catch {
-    // ignore
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "QuotaExceededError") {
+      toast.error("Хранилище браузера заполнено. Очистите данные сайта.");
+    }
   }
 }
 
@@ -210,7 +219,9 @@ export function clearAllProgress(): void {
       }
     }
     keysToRemove.forEach((key) => localStorage.removeItem(key));
-  } catch {
-    // ignore
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "QuotaExceededError") {
+      toast.error("Хранилище браузера заполнено. Очистите данные сайта.");
+    }
   }
 }
