@@ -10,11 +10,9 @@ import {
 
 const shortcuts = [
   { keys: ["Ctrl", "Enter"], description: "Проверить тест-кейсы" },
-  { keys: ["Ctrl", "Z"], description: "Отменить (undo)" },
-  { keys: ["Ctrl", "Shift", "Z"], description: "Вернуть (redo)" },
+  { keys: ["Ctrl", "Z"], description: "Удалить последний тест-кейс" },
+  { keys: ["Esc"], description: "Сбросить сессию / Закрыть диалог" },
   { keys: ["?"], description: "Показать горячие клавиши" },
-  { keys: ["1", "–", "8"], description: "Быстрый выбор задания" },
-  { keys: ["Esc"], description: "Закрыть диалог" },
 ];
 
 export function KeyboardShortcutsDialog({
