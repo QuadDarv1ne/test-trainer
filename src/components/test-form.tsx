@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -37,13 +37,22 @@ interface TestFormProps {
   onAdd: (inputs: string[], expected: string, category: TestCaseCategory, comment: string) => void;
 }
 
+const emptyInputs = (paramsCount: number) => paramsCount.map(() => "");
+
 export function TestForm({ task, onAdd }: TestFormProps) {
-  const [inputs, setInputs] = useState<string[]>(
-    task.params.map(() => "")
-  );
+  const [inputs, setInputs] = useState<string[]>(() => emptyInputs(task.params));
   const [expected, setExpected] = useState("");
   const [category, setCategory] = useState<TestCaseCategory>("Нормальное значение");
   const [comment, setComment] = useState("");
+
+  // Reset form when task changes
+  const paramCount = task.params.length;
+  useEffect(() => {
+    setInputs(emptyInputs(task.params));
+    setExpected("");
+    setComment("");
+    setCategory("Нормальное значение");
+  }, [paramCount]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +73,14 @@ export function TestForm({ task, onAdd }: TestFormProps) {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-3">
-          {task.params.map((param, idx) => (
+          {task.params.map((param, idx) => {
+            const inputValue = inputs[idx];
+            const typeWarning =
+              param.type === "number" &&
+              inputValue !== "" &&
+              isNaN(Number(inputValue.trim())) &&
+              inputValue.trim() !== "";
+            return (
             <div key={param.name} className="space-y-1">
               <Label className="text-xs font-medium">
                 {param.name}
@@ -88,8 +104,14 @@ export function TestForm({ task, onAdd }: TestFormProps) {
                 }}
                 className="h-9 text-sm"
               />
+              {typeWarning && (
+                <p className="text-[10px] text-amber-600 dark:text-amber-400">
+                  Ожидается число, введено: «{inputValue}»
+                </p>
+              )}
             </div>
-          ))}
+            );
+          })}
 
           <div className="space-y-1">
             <Label className="text-xs font-medium">Ожидаемый результат</Label>
