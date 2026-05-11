@@ -112,6 +112,16 @@ export default function Home() {
     [selectedTask]
   );
 
+  const handleReorderTestCases = useCallback(
+    (reordered: typeof testCases) => {
+      setTestCases(reordered);
+      if (selectedTask) {
+        saveCurrentSession(selectedTask.id, reordered);
+      }
+    },
+    [selectedTask]
+  );
+
   const handleSubmit = useCallback(() => {
     if (!selectedTask || testCases.length === 0) return;
     const result = evaluateTestCases(selectedTask, testCases);
@@ -336,7 +346,7 @@ export default function Home() {
                     {/* Right panel - test form and list */}
                     <div className="space-y-4">
                       <TestForm task={selectedTask} onAdd={handleAddTestCase} />
-                      <TestList testCases={testCases} onRemove={handleRemoveTestCase} onSubmit={handleSubmit} />
+                      <TestList testCases={testCases} onRemove={handleRemoveTestCase} onSubmit={handleSubmit} onReorder={handleReorderTestCases} />
                     </div>
                   </div>
                 </motion.div>
