@@ -113,6 +113,69 @@ function validatePassword(
   return { valid: errors.length === 0, errors };
 }
 
+function stringTransform(
+  str1: string,
+  str2: string,
+  start: number,
+  length: number
+): string {
+  if (typeof str1 !== "string" || typeof str2 !== "string")
+    throw new Error("Аргументы должны быть строками");
+  if (!Number.isInteger(start)) throw new Error("Начало должно быть целым числом");
+  if (!Number.isInteger(length)) throw new Error("Длина должна быть целым числом");
+  if (start < 0) throw new Error("Начало не может быть отрицательным");
+  if (length < 0) throw new Error("Длина не может быть отрицательной");
+  if (start >= str1.length) return str1 + str2;
+  const actualLength = Math.min(length, str1.length - start);
+  const substring = str1.substring(start, start + actualLength);
+  return str1 + str2 + substring;
+}
+
+function validateDate(
+  day: number,
+  month: number,
+  year: number
+): { valid: boolean; reason?: string } {
+  if (!Number.isInteger(day) || !Number.isInteger(month) || !Number.isInteger(year))
+    throw new Error("День, месяц и год должны быть целыми числами");
+  if (year < 1 || year > 9999) return { valid: false, reason: "Год должен быть от 1 до 9999" };
+  if (month < 1 || month > 12) return { valid: false, reason: "Месяц должен быть от 1 до 12" };
+  if (day < 1) return { valid: false, reason: "День не может быть меньше 1" };
+  const daysInMonth = [31, (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  if (day > daysInMonth[month - 1]) return { valid: false, reason: `В месяце ${month} не более ${daysInMonth[month - 1]} дней` };
+  return { valid: true };
+}
+
+function sortAndFilter(arr: number[]): number[] {
+  if (!Array.isArray(arr))
+    throw new Error("Аргумент должен быть массивом");
+  if (arr.length === 0) return [];
+  for (const item of arr) {
+    if (typeof item !== "number" || isNaN(item))
+      throw new Error("Все элементы должны быть числами");
+  }
+  if (arr.length > 1000) throw new Error("Массив слишком большой (макс. 1000 элементов)");
+  return arr.filter((n) => n >= 0).sort((a, b) => a - b);
+}
+
+function validateEmail(email: string): { valid: boolean; reason?: string } {
+  if (typeof email !== "string")
+    throw new Error("Email должен быть строкой");
+  if (email.length === 0) return { valid: false, reason: "Пустая строка" };
+  if (email.length > 254) return { valid: false, reason: "Слишком длинный email (макс. 254 символа)" };
+  const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!regex.test(email)) {
+    if (!email.includes("@")) return { valid: false, reason: "Отсутствует символ @" };
+    const [local, domain] = email.split("@");
+    if (!local || local.length === 0) return { valid: false, reason: "Пустая локальная часть" };
+    if (!domain || !domain.includes(".")) return { valid: false, reason: "Некорректный домен" };
+    const parts = domain.split(".");
+    if (parts[parts.length - 1].length < 2) return { valid: false, reason: "Домен верхнего уровня слишком короткий" };
+    return { valid: false, reason: "Некорректный формат email" };
+  }
+  return { valid: true };
+}
+
 // Map of reference functions
 export const referenceFunctions: Record<
   number,
@@ -124,6 +187,10 @@ export const referenceFunctions: Record<
   4: (args: unknown[]) => isLeapYear(args[0] as number),
   5: (args: unknown[]) => triangleType(args[0] as number, args[1] as number, args[2] as number),
   6: (args: unknown[]) => validatePassword(args[0] as string),
+  7: (args: unknown[]) => stringTransform(args[0] as string, args[1] as string, args[2] as number, args[3] as number),
+  8: (args: unknown[]) => validateDate(args[0] as number, args[1] as number, args[2] as number),
+  9: (args: unknown[]) => sortAndFilter(args[0] as number[]),
+  10: (args: unknown[]) => validateEmail(args[0] as string),
 };
 
 export const tasks: Task[] = [
@@ -584,6 +651,379 @@ export const tasks: Task[] = [
       { value: "abcdefg1!", description: "Нет заглавных" },
       { value: "Abcdefgh!", description: "Нет цифр" },
       { value: "Abcdefg12", description: "Нет спецсимволов" },
+    ],
+  },
+  {
+    id: 7,
+    name: "Строковые операции",
+    difficulty: "Средне",
+    description:
+      "Выполняет **конкатенацию** двух строк и извлечение **подстроки** из первой строки. Если начальная позиция больше длины строки, возвращается просто конкатенация.",
+    signature: "stringTransform(str1: string, str2: string, start: number, length: number): string",
+    topics: ["Классы эквивалентности", "Граничные значения", "Многофакторное тестирование"],
+    params: [
+      { name: "str1", type: "string", description: "Первая строка (источник подстроки)" },
+      { name: "str2", type: "string", description: "Вторая строка (добавляется)" },
+      { name: "start", type: "number", description: "Начальная позиции подстроки (≥ 0)" },
+      { name: "length", type: "number", description: "Длина подстроки (≥ 0)" },
+    ],
+    returnType: "string",
+    code: `function stringTransform(str1: string, str2: string, start: number, length: number): string {
+  if (typeof str1 !== "string" || typeof str2 !== "string")
+    throw new Error("Аргументы должны быть строками");
+  if (!Number.isInteger(start)) throw new Error("Начало должно быть целым числом");
+  if (!Number.isInteger(length)) throw new Error("Длина должна быть целым числом");
+  if (start < 0) throw new Error("Начало не может быть отрицательным");
+  if (length < 0) throw new Error("Длина не может быть отрицательной");
+  if (start >= str1.length) return str1 + str2;
+  const actualLength = Math.min(length, str1.length - start);
+  const substring = str1.substring(start, start + actualLength);
+  return str1 + str2 + substring;
+}`,
+    equivalenceClasses: [
+      {
+        id: "ec1",
+        name: "EC1: Нормальная подстрока",
+        description: "start в пределах строки, length корректна",
+        exampleValues: [["hello", " world", 0, 3]],
+      },
+      {
+        id: "ec2",
+        name: "EC2: start = 0",
+        description: "Подстрока с начала строки",
+        exampleValues: [["abc", "def", 0, 2]],
+      },
+      {
+        id: "ec3",
+        name: "EC3: start ≥ str1.length",
+        description: "Позиция за пределами строки — возвращается конкатенация",
+        exampleValues: [["ab", "cd", 5, 2]],
+      },
+      {
+        id: "ec4",
+        name: "EC4: length = 0",
+        description: "Нулевая длина подстроки",
+        exampleValues: [["abc", "def", 1, 0]],
+      },
+      {
+        id: "ec5",
+        name: "EC5: length > остатка строки",
+        description: "Длина обрезается до конца строки",
+        exampleValues: [["abc", "def", 1, 10]],
+      },
+      {
+        id: "ec6",
+        name: "EC6: Пустая str1",
+        description: "Первая строка пустая",
+        exampleValues: [["", "abc", 0, 1]],
+      },
+      {
+        id: "ec7",
+        name: "EC7: Пустая str2",
+        description: "Вторая строка пустая",
+        exampleValues: [["abc", "", 0, 2]],
+      },
+      {
+        id: "ec8",
+        name: "EC8: start < 0",
+        description: "Недопустимая позиция",
+        exampleValues: [["abc", "def", -1, 2]],
+      },
+      {
+        id: "ec9",
+        name: "EC9: length < 0",
+        description: "Недопустимая длина",
+        exampleValues: [["abc", "def", 0, -1]],
+      },
+      {
+        id: "ec10",
+        name: "EC10: Нестроковые аргументы",
+        description: "Неверный тип строк",
+        exampleValues: [[123, "def", 0, 1], ["abc", 456, 0, 1]],
+      },
+    ],
+    boundaryValues: [
+      { value: ["a", "b", 0, 1], description: "Минимальные строки" },
+      { value: ["", "", 0, 0], description: "Пустые строки и нули" },
+      { value: ["abc", "def", 0, 3], description: "start=0, length=длина" },
+      { value: ["abc", "def", 2, 1], description: "Последний символ" },
+      { value: ["abc", "def", 3, 1], description: "start за границей" },
+      { value: ["abc", "def", -1, 1], description: "start < 0" },
+      { value: ["abc", "def", 0, -1], description: "length < 0" },
+    ],
+  },
+  {
+    id: 8,
+    name: "Валидация даты",
+    difficulty: "Средне",
+    description:
+      "Проверяет корректность **даты** (день, месяц, год). Учитывает високосные годы и количество дней в каждом месяце.",
+    signature: "validateDate(day: number, month: number, year: number): { valid: boolean; reason?: string }",
+    topics: ["Классы эквивалентности", "Граничные значения", "Логические условия"],
+    params: [
+      { name: "day", type: "number", description: "День месяца (1–31)" },
+      { name: "month", type: "number", description: "Месяц (1–12)" },
+      { name: "year", type: "number", description: "Год (1–9999)" },
+    ],
+    returnType: "{ valid: boolean; reason?: string }",
+    code: `function validateDate(day: number, month: number, year: number): { valid: boolean; reason?: string } {
+  if (!Number.isInteger(day) || !Number.isInteger(month) || !Number.isInteger(year))
+    throw new Error("День, месяц и год должны быть целыми числами");
+  if (year < 1 || year > 9999) return { valid: false, reason: "Год должен быть от 1 до 9999" };
+  if (month < 1 || month > 12) return { valid: false, reason: "Месяц должен быть от 1 до 12" };
+  if (day < 1) return { valid: false, reason: "День не может быть меньше 1" };
+  const daysInMonth = [31, (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  if (day > daysInMonth[month - 1]) return { valid: false, reason: \`В месяце \${month} не более \${daysInMonth[month - 1]} дней\` };
+  return { valid: true };
+}`,
+    equivalenceClasses: [
+      {
+        id: "ec1",
+        name: "EC1: Валидная дата",
+        description: "Корректные день, месяц, год",
+        exampleValues: [[15, 6, 2024], [1, 1, 2000]],
+      },
+      {
+        id: "ec2",
+        name: "EC2: 29 февраля високосного года",
+        description: "Валидный високосный год",
+        exampleValues: [[29, 2, 2024], [29, 2, 2000]],
+      },
+      {
+        id: "ec3",
+        name: "EC3: 29 февраля невисокосного года",
+        description: "Невалидный день для февраля",
+        exampleValues: [[29, 2, 2023], [29, 2, 1900]],
+      },
+      {
+        id: "ec4",
+        name: "EC4: 31 день в месяце с 30 днями",
+        description: "Превышение дней в месяце",
+        exampleValues: [[31, 4, 2024], [31, 6, 2024]],
+      },
+      {
+        id: "ec5",
+        name: "EC5: month < 1 или month > 12",
+        description: "Недопустимый месяц",
+        exampleValues: [[15, 0, 2024], [15, 13, 2024]],
+      },
+      {
+        id: "ec6",
+        name: "EC6: day < 1",
+        description: "Недопустимый день",
+        exampleValues: [[0, 6, 2024], [-1, 6, 2024]],
+      },
+      {
+        id: "ec7",
+        name: "EC7: year < 1 или year > 9999",
+        description: "Недопустимый год",
+        exampleValues: [[15, 6, 0], [15, 6, 10000]],
+      },
+      {
+        id: "ec8",
+        name: "EC8: Нечисловые аргументы",
+        description: "Неверный тип",
+        exampleValues: [["15", 6, 2024], [15, null, 2024]],
+      },
+    ],
+    boundaryValues: [
+      { value: [1, 1, 1], description: "Минимальная дата" },
+      { value: [31, 12, 9999], description: "Максимальная дата" },
+      { value: [1, 1, 2024], description: "Первый день года" },
+      { value: [31, 1, 2024], description: "31 января" },
+      { value: [28, 2, 2024], description: "28 февраля високосного" },
+      { value: [29, 2, 2024], description: "29 февраля високосного" },
+      { value: [29, 2, 2023], description: "29 февраля невисокосного" },
+      { value: [30, 2, 2024], description: "30 февраля — ошибка" },
+      { value: [31, 4, 2024], description: "31 апреля — ошибка" },
+      { value: [0, 6, 2024], description: "День = 0" },
+      { value: [15, 0, 2024], description: "Месяц = 0" },
+      { value: [15, 6, 0], description: "Год = 0" },
+    ],
+  },
+  {
+    id: 9,
+    name: "Сортировка и фильтрация массива",
+    difficulty: "Сложно",
+    description:
+      "Принимает массив чисел, **отфильтровывает** отрицательные и NaN значения, затем **сортирует** по возрастанию. Пустой массив возвращает пустой массив.",
+    signature: "sortAndFilter(arr: number[]): number[]",
+    topics: ["Классы эквивалентности", "Граничные значения", "Проверка коллекций"],
+    params: [
+      { name: "arr", type: "number[]", description: "Массив чисел (макс. 1000 элементов)" },
+    ],
+    returnType: "number[]",
+    code: `function sortAndFilter(arr: number[]): number[] {
+  if (!Array.isArray(arr))
+    throw new Error("Аргумент должен быть массивом");
+  if (arr.length === 0) return [];
+  for (const item of arr) {
+    if (typeof item !== "number" || isNaN(item))
+      throw new Error("Все элементы должны быть числами");
+  }
+  if (arr.length > 1000) throw new Error("Массив слишком большой (макс. 1000 элементов)");
+  return arr.filter(n => n >= 0).sort((a, b) => a - b);
+}`,
+    equivalenceClasses: [
+      {
+        id: "ec1",
+        name: "EC1: Массив с положительными числами",
+        description: "Все элементы ≥ 0",
+        exampleValues: [[5, 3, 1, 4, 2]],
+      },
+      {
+        id: "ec2",
+        name: "EC2: Массив с отрицательными",
+        description: "Смешанные — отрицательные отфильтровываются",
+        exampleValues: [[-3, 5, -1, 2, 0]],
+      },
+      {
+        id: "ec3",
+        name: "EC3: Пустой массив",
+        description: "Возвращает пустой массив",
+        exampleValues: [[]],
+      },
+      {
+        id: "ec4",
+        name: "EC4: Один элемент",
+        description: "Одиночный элемент",
+        exampleValues: [[42], [-5], [0]],
+      },
+      {
+        id: "ec5",
+        name: "EC5: Все отрицательные",
+        description: "Результат — пустой массив",
+        exampleValues: [[-1, -2, -3]],
+      },
+      {
+        id: "ec6",
+        name: "EC6: Дубликаты",
+        description: "Массив с повторяющимися элементами",
+        exampleValues: [[3, 1, 3, 2, 1]],
+      },
+      {
+        id: "ec7",
+        name: "EC7: Содержит NaN",
+        description: "Недопустимый элемент",
+        exampleValues: [[1, NaN, 3]],
+      },
+      {
+        id: "ec8",
+        name: "EC8: Не массив",
+        description: "Неверный тип",
+        exampleValues: ["not an array", 42, null],
+      },
+      {
+        id: "ec9",
+        name: "EC9: Массив > 1000 элементов",
+        description: "Превышение размера",
+        exampleValues: [Array(1001).fill(1)],
+      },
+    ],
+    boundaryValues: [
+      { value: [[]], description: "Пустой массив" },
+      { value: [[1]], description: "Один элемент" },
+      { value: [[0]], description: "Ноль" },
+      { value: [[-1]], description: "Один отрицательный" },
+      { value: [[1, 2, 3]], description: "Уже отсортирован" },
+      { value: [[3, 2, 1]], description: "Обратный порядок" },
+      { value: [[-1, 0, 1]], description: "Смешанный с нулём" },
+    ],
+  },
+  {
+    id: 10,
+    name: "Валидация email",
+    difficulty: "Легко",
+    description:
+      "Проверяет корректность **email адреса** по формату:\n\n- Наличие `@`\n- Непустая локальная часть\n- Корректный домен с точкой\n- Домен верхнего уровня ≥ 2 символов\n- Максимальная длина 254 символа",
+    signature: "validateEmail(email: string): { valid: boolean; reason?: string }",
+    topics: ["Классы эквивалентности", "Проверка форматов"],
+    params: [
+      { name: "email", type: "string", description: "Email адрес для проверки" },
+    ],
+    returnType: "{ valid: boolean; reason?: string }",
+    code: `function validateEmail(email: string): { valid: boolean; reason?: string } {
+  if (typeof email !== "string")
+    throw new Error("Email должен быть строкой");
+  if (email.length === 0) return { valid: false, reason: "Пустая строка" };
+  if (email.length > 254) return { valid: false, reason: "Слишком длинный email (макс. 254 символа)" };
+  const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/;
+  if (!regex.test(email)) {
+    if (!email.includes("@")) return { valid: false, reason: "Отсутствует символ @" };
+    const [local, domain] = email.split("@");
+    if (!local || local.length === 0) return { valid: false, reason: "Пустая локальная часть" };
+    if (!domain || !domain.includes(".")) return { valid: false, reason: "Некорректный домен" };
+    const parts = domain.split(".");
+    if (parts[parts.length - 1].length < 2) return { valid: false, reason: "Домен верхнего уровня слишком короткий" };
+    return { valid: false, reason: "Некорректный формат email" };
+  }
+  return { valid: true };
+}`,
+    equivalenceClasses: [
+      {
+        id: "ec1",
+        name: "EC1: Валидный email",
+        description: "Корректный формат",
+        exampleValues: ["user@example.com", "test.user@domain.org"],
+      },
+      {
+        id: "ec2",
+        name: "EC2: Пустая строка",
+        description: "Пустой email",
+        exampleValues: [""],
+      },
+      {
+        id: "ec3",
+        name: "EC3: Слишком длинный",
+        description: "Длина > 254 символа",
+        exampleValues: ["a".repeat(250) + "@example.com"],
+      },
+      {
+        id: "ec4",
+        name: "EC4: Без @",
+        description: "Отсутствует символ @",
+        exampleValues: ["userexample.com", "user.example.com"],
+      },
+      {
+        id: "ec5",
+        name: "EC5: Пустая локальная часть",
+        description: "@ в начале",
+        exampleValues: ["@example.com"],
+      },
+      {
+        id: "ec6",
+        name: "EC6: Нет точки в домене",
+        description: "Домен без TLD",
+        exampleValues: ["user@example"],
+      },
+      {
+        id: "ec7",
+        name: "EC7: TLD короче 2 символов",
+        description: "Однобуквенный домен верхнего уровня",
+        exampleValues: ["user@example.c"],
+      },
+      {
+        id: "ec8",
+        name: "EC8: Спецсимволы в локальной части",
+        description: "Недопустимые символы до @",
+        exampleValues: ["user name@example.com", "user#name@example.com"],
+      },
+      {
+        id: "ec9",
+        name: "EC9: Не строковый тип",
+        description: "Неверный тип",
+        exampleValues: [123, null, undefined],
+      },
+    ],
+    boundaryValues: [
+      { value: "a@b.co", description: "Минимальный валидный" },
+      { value: "user@example.com", description: "Стандартный email" },
+      { value: "test.user+tag@sub.domain.org", description: "Сложный валидный" },
+      { value: "", description: "Пустая строка" },
+      { value: "no-at-sign.com", description: "Без @" },
+      { value: "@domain.com", description: "Пустая локальная часть" },
+      { value: "user@domain", description: "Без точки в домене" },
+      { value: "user@domain.c", description: "TLD из 1 символа" },
     ],
   },
 ];
