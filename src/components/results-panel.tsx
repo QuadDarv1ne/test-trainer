@@ -28,17 +28,19 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import type { EvaluationResult } from "@/lib/evaluator";
-import { categoryColors } from "./test-form";
+import { categoryColors, categoryI18nKeys } from "./test-form";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useLocale } from "@/lib/i18n.client";
+import { useAppStore } from "@/lib/store";
 
 interface ResultsPanelProps {
-  result: EvaluationResult | null;
-  onReset: () => void;
+  result?: EvaluationResult | null;
+  onReset?: () => void;
 }
 
 function ScoreCircle({
@@ -98,42 +100,42 @@ function ScoreCircle({
   );
 }
 
-function getGrade(score: number): { text: string; color: string; emoji: string } {
-  if (score >= 90) return { text: "Отлично", color: "text-emerald-600", emoji: "🌟" };
-  if (score >= 75) return { text: "Хорошо", color: "text-teal-600", emoji: "👍" };
-  if (score >= 60) return { text: "Удовлетворительно", color: "text-amber-600", emoji: "📝" };
-  if (score >= 40) return { text: "Неудовлетворительно", color: "text-orange-600", emoji: "⚠️" };
-  return { text: "Плохо", color: "text-rose-600", emoji: "❌" };
+function getGrade(score: number, t: (key: string) => string): { text: string; color: string } {
+  if (score >= 90) return { text: t("results_grade_excellent"), color: "text-emerald-600" };
+  if (score >= 75) return { text: t("results_grade_good"), color: "text-teal-600" };
+  if (score >= 60) return { text: t("results_grade_satisfactory"), color: "text-amber-600" };
+  if (score >= 40) return { text: t("results_grade_poor"), color: "text-orange-600" };
+  return { text: t("results_grade_bad"), color: "text-rose-600" };
 }
 
-function formatResultsAsText(result: EvaluationResult): string {
+function formatResultsAsText(result: EvaluationResult, t: (key: string) => string): string {
   const lines: string[] = [];
-  const grade = getGrade(result.overallScore);
+  const grade = getGrade(result.overallScore, t);
 
-  lines.push(`=== Результаты проверки ===`);
-  lines.push(`Задание: ${result.task.name}`);
-  lines.push(`Оценка: ${result.overallScore}% — ${grade.text}`);
+  lines.push(`=== ${t("results_title")} ===`);
+  lines.push(`${t("results_task")}: ${result.task.name}`);
+  lines.push(`${t("results_overall")}: ${result.overallScore}% — ${grade.text}`);
   lines.push("");
-  lines.push(`--- Оценки по категориям ---`);
-  lines.push(`Классы эквивалентности: ${result.ecCoverage}% (${result.coveredEcsCount}/${result.totalEcs})`);
-  lines.push(`Граничные значения: ${result.boundaryCoverage}% (${result.coveredBvsCount}/${result.totalBvs})`);
-  lines.push(`Корректность: ${result.correctnessScore}%`);
+  lines.push(`--- ${t("results_ec")} / ${t("results_bv")} / ${t("results_correctness")} ---`);
+  lines.push(`${t("results_ec")}: ${result.ecCoverage}% (${result.coveredEcsCount}/${result.totalEcs})`);
+  lines.push(`${t("results_bv")}: ${result.boundaryCoverage}% (${result.coveredBvsCount}/${result.totalBvs})`);
+  lines.push(`${t("results_correctness")}: ${result.correctnessScore}%`);
   lines.push("");
-  lines.push(`--- Детальные результаты тест-кейсов ---`);
+  lines.push(`--- ${t("results_detail_title")} ---`);
 
   result.results.forEach((r, idx) => {
-    lines.push(`#${idx + 1}: Вход: (${r.testCase.inputs.join(", ")})`);
-    lines.push(`   Ожидание: ${r.testCase.expectedOutput}`);
-    lines.push(`   Факт: ${r.actualOutput}`);
-    lines.push(`   Статус: ${r.isCorrect ? "✓ Верно" : "✗ Неверно"}`);
+    lines.push(`#${idx + 1}: ${t("results_detail_col_input")}: (${r.testCase.inputs.join(", ")})`);
+    lines.push(`   ${t("results_detail_col_expected")}: ${r.testCase.expectedOutput}`);
+    lines.push(`   ${t("results_detail_col_actual")}: ${r.actualOutput}`);
+    lines.push(`   ${t("results_detail_col_status")}: ${r.isCorrect ? t("results_status_correct") : t("results_status_incorrect")}`);
     if (r.coveredClasses.length > 0) {
-      lines.push(`   Покрытые классы: ${r.coveredClasses.join(", ")}`);
+      lines.push(`   ${t("results_ec")}: ${r.coveredClasses.join(", ")}`);
     }
     lines.push("");
   });
 
   if (result.uncoveredEcIds.length > 0) {
-    lines.push("--- Непокрытые классы эквивалентности ---");
+    lines.push(`--- ${t("results_uncovered_ec")} ---`);
     for (const id of result.uncoveredEcIds) {
       const ec = result.task.equivalenceClasses.find((e) => e.id === id);
       if (ec) lines.push(`  - ${ec.name}: ${ec.description}`);
@@ -142,7 +144,7 @@ function formatResultsAsText(result: EvaluationResult): string {
   }
 
   if (result.uncoveredBvDescriptions.length > 0) {
-    lines.push("--- Непокрытые граничные значения ---");
+    lines.push(`--- ${t("results_uncovered_bv")} ---`);
     for (const desc of result.uncoveredBvDescriptions) {
       lines.push(`  - ${desc}`);
     }
@@ -151,24 +153,32 @@ function formatResultsAsText(result: EvaluationResult): string {
   return lines.join("\n");
 }
 
-export function ResultsPanel({ result, onReset }: ResultsPanelProps) {
+export function ResultsPanel({ result: resultProp, onReset: onResetProp }: ResultsPanelProps) {
+  const { t } = useLocale();
   const [copied, setCopied] = useState(false);
+
+  const storeResult = useAppStore((s) => s.evaluationResult);
+  const setEvaluationResult = useAppStore((s) => s.setEvaluationResult);
+  const result = resultProp ?? storeResult;
+  const onReset = onResetProp ?? (() => {
+    setEvaluationResult(null);
+  });
 
   const handleCopy = async () => {
     if (!result) return;
     try {
-      await navigator.clipboard.writeText(formatResultsAsText(result));
+      await navigator.clipboard.writeText(formatResultsAsText(result, t));
       setCopied(true);
-      toast.success("Результаты скопированы!");
+      toast.success(t("toast_results_copied"));
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast.error("Не удалось скопировать результаты");
+      toast.error(t("toast_copy_failed"));
     }
   };
 
   const exportJSON = () => {
     if (!result) return;
-    const grade = getGrade(result.overallScore);
+    const grade = getGrade(result.overallScore, t);
     const data = {
       task: result.task.name,
       taskId: result.task.id,
@@ -198,31 +208,31 @@ export function ResultsPanel({ result, onReset }: ResultsPanelProps) {
     a.download = `result-task-${result.task.id}-${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success("Экспорт в JSON завершён");
+    toast.success(t("toast_export_json"));
   };
 
   const exportCSV = () => {
     if (!result) return;
-    const grade = getGrade(result.overallScore);
+    const grade = getGrade(result.overallScore, t);
     const rows: string[] = [];
-    rows.push("Метрика,Значение");
-    rows.push(`Задание,${result.task.name}`);
-    rows.push(`Общая оценка,${result.overallScore}%`);
-    rows.push(`Оценка,${grade.text}`);
-    rows.push(`Классы эквивалентности,${result.ecCoverage}% (${result.coveredEcsCount}/${result.totalEcs})`);
-    rows.push(`Граничные значения,${result.boundaryCoverage}% (${result.coveredBvsCount}/${result.totalBvs})`);
-    rows.push(`Корректность,${result.correctnessScore}%`);
+    rows.push(`${t("results_detail_col_status")},${t("results_metric_score")}`);
+    rows.push(`${t("results_task")},${result.task.name}`);
+    rows.push(`${t("results_overall")},${result.overallScore}%`);
+    rows.push(`${t("results_detail_col_status")},${grade.text}`);
+    rows.push(`${t("results_ec")},${result.ecCoverage}% (${result.coveredEcsCount}/${result.totalEcs})`);
+    rows.push(`${t("results_bv")},${result.boundaryCoverage}% (${result.coveredBvsCount}/${result.totalBvs})`);
+    rows.push(`${t("results_correctness")},${result.correctnessScore}%`);
     rows.push("");
-    rows.push("№,Вход,Ожидание,Факт,Статус,Покрытые классы");
+    rows.push(`#,${t("test_list_col_input")},${t("test_list_col_expected")},${t("results_detail_col_actual")},${t("results_detail_col_status")},${t("results_ec")}`);
     result.results.forEach((r, idx) => {
       const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
       rows.push(
-        `${idx + 1},${escape(r.testCase.inputs.join(", "))},${escape(r.testCase.expectedOutput)},${escape(r.actualOutput)},${r.isCorrect ? "Верно" : "Неверно"},${escape(r.coveredClasses.join(", "))}`
+        `${idx + 1},${escape(r.testCase.inputs.join(", "))},${escape(r.testCase.expectedOutput)},${escape(r.actualOutput)},${r.isCorrect ? t("results_status_correct") : t("results_status_incorrect")},${escape(r.coveredClasses.join(", "))}`
       );
     });
     if (result.uncoveredEcIds.length > 0) {
       rows.push("");
-      rows.push("Непокрытые классы эквивалентности");
+      rows.push(t("results_uncovered_ec"));
       for (const id of result.uncoveredEcIds) {
         const ec = result.task.equivalenceClasses.find((e) => e.id === id);
         if (ec) rows.push(`- ${ec.name}: ${ec.description}`);
@@ -235,7 +245,7 @@ export function ResultsPanel({ result, onReset }: ResultsPanelProps) {
     a.download = `result-task-${result.task.id}-${Date.now()}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success("Экспорт в CSV завершён");
+    toast.success(t("toast_export_csv"));
   };
 
   if (!result) {
@@ -244,17 +254,17 @@ export function ResultsPanel({ result, onReset }: ResultsPanelProps) {
         <CardContent className="py-16 text-center">
           <BarChart3 className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
           <p className="text-muted-foreground">
-            Результаты появятся после проверки тест-кейсов.
+            {t("results_empty")}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            Выберите задание, добавьте тест-кейсы и нажмите «Проверить».
+            {t("results_empty_hint")}
           </p>
         </CardContent>
       </Card>
     );
   }
 
-  const grade = getGrade(result.overallScore);
+  const grade = getGrade(result.overallScore, t);
 
   return (
     <motion.div
@@ -266,26 +276,18 @@ export function ResultsPanel({ result, onReset }: ResultsPanelProps) {
       <Card className="border-emerald-200 dark:border-emerald-800">
         <CardContent className="pt-6">
           <div className="text-center mb-6">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-              className="text-4xl mb-2"
-            >
-              {grade.emoji}
-            </motion.div>
             <h2 className={`text-2xl font-bold ${grade.color}`}>
               {grade.text}
             </h2>
             <p className="text-sm text-muted-foreground mt-1">
-              Задание: {result.task.name}
+              {t("results_task")}: {result.task.name}
             </p>
           </div>
 
           <div className="flex flex-wrap justify-center gap-6">
             <ScoreCircle
               score={result.overallScore}
-              label="Общая оценка"
+              label={t("results_overall")}
               color={
                 result.overallScore >= 75
                   ? "#10b981"
@@ -297,19 +299,19 @@ export function ResultsPanel({ result, onReset }: ResultsPanelProps) {
             />
             <ScoreCircle
               score={result.ecCoverage}
-              label="Классы эквивалентности"
+              label={t("results_ec")}
               color="#14b8a6"
               delay={0.1}
             />
             <ScoreCircle
               score={result.boundaryCoverage}
-              label="Граничные значения"
+              label={t("results_bv")}
               color="#f59e0b"
               delay={0.2}
             />
             <ScoreCircle
               score={result.correctnessScore}
-              label="Корректность"
+              label={t("results_correctness")}
               color="#8b5cf6"
               delay={0.3}
             />
@@ -324,7 +326,7 @@ export function ResultsPanel({ result, onReset }: ResultsPanelProps) {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-semibold flex items-center gap-2">
               <Target className="h-4 w-4 text-teal-600" />
-              Классы эквивалентности
+              {t("results_ec")}
               <Badge variant="secondary" className="ml-auto text-xs">
                 {result.coveredEcsCount}/{result.totalEcs}
               </Badge>
@@ -364,7 +366,7 @@ export function ResultsPanel({ result, onReset }: ResultsPanelProps) {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-semibold flex items-center gap-2">
               <Award className="h-4 w-4 text-amber-600" />
-              Граничные значения
+              {t("results_bv")}
               <Badge variant="secondary" className="ml-auto text-xs">
                 {result.coveredBvsCount}/{result.totalBvs}
               </Badge>
@@ -412,7 +414,7 @@ export function ResultsPanel({ result, onReset }: ResultsPanelProps) {
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm font-semibold">
-              Детальные результаты
+              {t("results_detail_title")}
             </CardTitle>
             <div className="flex items-center gap-2">
               <Button
@@ -426,21 +428,21 @@ export function ResultsPanel({ result, onReset }: ResultsPanelProps) {
                 ) : (
                   <Copy className="h-3.5 w-3.5" />
                 )}
-                {copied ? "Скопировано" : "Копировать"}
+                {copied ? t("results_copied") : t("results_copy")}
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="text-xs gap-1.5">
                     <Download className="h-3.5 w-3.5" />
-                    Экспорт
+                    {t("results_export")}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={exportJSON}>
-                    Экспорт в JSON
+                    {t("results_export_json")}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={exportCSV}>
-                    Экспорт в CSV
+                    {t("results_export_csv")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -453,10 +455,10 @@ export function ResultsPanel({ result, onReset }: ResultsPanelProps) {
               <TableHeader>
                 <TableRow>
                   <TableHead className="text-xs w-10">#</TableHead>
-                  <TableHead className="text-xs">Вход</TableHead>
-                  <TableHead className="text-xs">Ожидание</TableHead>
-                  <TableHead className="text-xs">Факт</TableHead>
-                  <TableHead className="text-xs w-20">Статус</TableHead>
+                  <TableHead className="text-xs">{t("test_list_col_input")}</TableHead>
+                  <TableHead className="text-xs">{t("test_list_col_expected")}</TableHead>
+                  <TableHead className="text-xs">{t("results_detail_col_actual")}</TableHead>
+                  <TableHead className="text-xs w-20">{t("results_detail_col_status")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -489,11 +491,11 @@ export function ResultsPanel({ result, onReset }: ResultsPanelProps) {
                     <TableCell className="py-2">
                       {r.isCorrect ? (
                         <Badge className="bg-emerald-100 text-emerald-800 text-[10px] dark:bg-emerald-900/30 dark:text-emerald-400">
-                          ✓ Верно
+                          ✓ {t("results_status_correct")}
                         </Badge>
                       ) : (
                         <Badge className="bg-rose-100 text-rose-800 text-[10px] dark:bg-rose-900/30 dark:text-rose-400">
-                          ✗ Неверно
+                          ✗ {t("results_status_incorrect")}
                         </Badge>
                       )}
                     </TableCell>
@@ -510,11 +512,11 @@ export function ResultsPanel({ result, onReset }: ResultsPanelProps) {
         <Alert className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20">
           <ArrowRight className="h-4 w-4 text-amber-600" />
           <AlertDescription className="text-sm">
-            <strong>Рекомендации:</strong>
+            <strong>{t("results_recommendations")}:</strong>
             <ul className="mt-1 list-disc list-inside space-y-0.5 text-xs">
               {result.uncoveredEcIds.length > 0 && (
                 <li>
-                  Покройте непокрытые классы эквивалентности:{" "}
+                  {t("results_uncovered_ec")}:{" "}
                   {result.uncoveredEcIds.map((id) => {
                     const ec = result.task.equivalenceClasses.find((e) => e.id === id);
                     return ec?.name;
@@ -523,7 +525,7 @@ export function ResultsPanel({ result, onReset }: ResultsPanelProps) {
               )}
               {result.uncoveredBvDescriptions.length > 0 && (
                 <li>
-                  Протестируйте граничные значения:{" "}
+                  {t("results_uncovered_bv")}:{" "}
                   {result.uncoveredBvDescriptions.join(", ")}
                 </li>
               )}
@@ -539,7 +541,7 @@ export function ResultsPanel({ result, onReset }: ResultsPanelProps) {
           onClick={onReset}
           className="mt-2"
         >
-          Пройти заново
+          {t("results_reset")}
         </Button>
       </div>
     </motion.div>

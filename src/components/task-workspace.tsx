@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,10 @@ import {
   Lightbulb,
 } from "lucide-react";
 import type { Task } from "@/lib/tasks";
+import { useLocale } from "@/lib/i18n.client";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import ReactMarkdown from "react-markdown";
 
 interface TaskWorkspaceProps {
   task: Task;
@@ -22,19 +26,20 @@ interface TaskWorkspaceProps {
 }
 
 export function TaskWorkspace({ task, testCasesCount = 0 }: TaskWorkspaceProps) {
+  const { t } = useLocale();
   const [hintIndex, setHintIndex] = useState(0);
 
   // Generate hints from uncovered ECs and BVs
-  const allHints = [
+  const allHints = useMemo(() => [
     ...task.equivalenceClasses.map((ec) => ({
       type: "ec" as const,
-      text: `Попробуйте класс: ${ec.name} — ${ec.description}. Пример: ${JSON.stringify(ec.exampleValues[0])}`,
+      text: `${t("trainer_hint")}: ${ec.name} — ${ec.description}. ${t("form_placeholder_number").split(":")[1] || ""} ${JSON.stringify(ec.exampleValues[0])}`,
     })),
     ...task.boundaryValues.map((bv) => ({
       type: "bv" as const,
-      text: `Проверьте граничное значение: ${Array.isArray(bv.value) ? `[${bv.value.join(", ")}]` : bv.value} — ${bv.description}`,
+      text: `${t("trainer_hint")}: ${Array.isArray(bv.value) ? `[${bv.value.join(", ")}]` : bv.value} — ${bv.description}`,
     })),
-  ];
+  ], [task, t]);
 
   const showHint = testCasesCount > 0 && hintIndex < allHints.length;
   return (
@@ -52,16 +57,29 @@ export function TaskWorkspace({ task, testCasesCount = 0 }: TaskWorkspaceProps) 
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {task.description}
-            </p>
+            <div className="text-sm text-muted-foreground leading-relaxed">
+              <ReactMarkdown
+                components={{
+                  p: ({ children }) => <p className="text-sm text-muted-foreground leading-relaxed">{children}</p>,
+                  code: ({ children }) => (
+                    <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono">{children}</code>
+                  ),
+                  ul: ({ children }) => <ul className="list-disc list-inside space-y-1 my-2">{children}</ul>,
+                  ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 my-2">{children}</ol>,
+                  li: ({ children }) => <li className="text-sm text-muted-foreground">{children}</li>,
+                  strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+                }}
+              >
+                {task.description}
+              </ReactMarkdown>
+            </div>
 
             {/* Signature */}
             <div className="bg-zinc-900 dark:bg-zinc-950 rounded-lg p-3">
               <div className="flex items-center gap-2 mb-2">
                 <Code2 className="h-3.5 w-3.5 text-emerald-400" />
                 <span className="text-xs font-medium text-zinc-400">
-                  Сигнатура функции
+                  {t("trainer_signature")}
                 </span>
               </div>
               <code className="text-sm font-mono text-emerald-300">
@@ -73,7 +91,7 @@ export function TaskWorkspace({ task, testCasesCount = 0 }: TaskWorkspaceProps) 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <FileText className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-xs font-medium">Параметры</span>
+                <span className="text-xs font-medium">{t("trainer_params")}</span>
               </div>
               <div className="space-y-1.5">
                 {task.params.map((param) => (
@@ -93,7 +111,7 @@ export function TaskWorkspace({ task, testCasesCount = 0 }: TaskWorkspaceProps) 
                   </div>
                 ))}
                 <div className="flex items-center gap-2 text-xs bg-muted/50 rounded-md p-2">
-                  <span className="text-muted-foreground">Возвращаемое:</span>
+                  <span className="text-muted-foreground">{t("trainer_return_type")}:</span>
                   <code className="font-mono text-teal-700 dark:text-teal-400 font-medium">
                     {task.returnType}
                   </code>
@@ -102,16 +120,27 @@ export function TaskWorkspace({ task, testCasesCount = 0 }: TaskWorkspaceProps) 
             </div>
 
             {/* Code */}
-            <div className="bg-zinc-900 dark:bg-zinc-950 rounded-lg p-3 overflow-x-auto">
-              <div className="flex items-center gap-2 mb-2">
+            <div className="rounded-lg overflow-hidden">
+              <div className="flex items-center gap-2 mb-0 px-3 py-2 bg-zinc-800 dark:bg-zinc-950">
                 <Code2 className="h-3.5 w-3.5 text-zinc-400" />
                 <span className="text-xs font-medium text-zinc-400">
-                  Реализация
+                  {t("trainer_implementation")}
                 </span>
               </div>
-              <pre className="text-xs font-mono text-zinc-300 whitespace-pre-wrap leading-relaxed">
-                <code>{task.code}</code>
-              </pre>
+              <SyntaxHighlighter
+                language="typescript"
+                style={oneDark}
+                customStyle={{
+                  margin: 0,
+                  borderRadius: 0,
+                  fontSize: "0.75rem",
+                  lineHeight: "1.5",
+                }}
+                showLineNumbers
+                wrapLines
+              >
+                {task.code}
+              </SyntaxHighlighter>
             </div>
 
             {/* Progressive hint */}
@@ -120,7 +149,7 @@ export function TaskWorkspace({ task, testCasesCount = 0 }: TaskWorkspaceProps) 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
-                    <span className="text-xs font-medium">Подсказка</span>
+                    <span className="text-xs font-medium">{t("trainer_hint")}</span>
                     <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
                       {hintIndex + 1}/{allHints.length}
                     </Badge>
@@ -131,7 +160,7 @@ export function TaskWorkspace({ task, testCasesCount = 0 }: TaskWorkspaceProps) 
                     className="text-xs h-7 px-2"
                     onClick={() => setHintIndex((i) => i + 1)}
                   >
-                    Следующая →
+                    {t("trainer_next_hint")}
                   </Button>
                 </div>
                 <div className="text-xs bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md p-2.5 text-amber-800 dark:text-amber-300">
@@ -145,7 +174,7 @@ export function TaskWorkspace({ task, testCasesCount = 0 }: TaskWorkspaceProps) 
               <div className="flex items-center gap-2">
                 <Layers className="h-3.5 w-3.5 text-teal-600" />
                 <span className="text-xs font-medium">
-                  Классы эквивалентности ({task.equivalenceClasses.length})
+                  {t("trainer_ec_title")} ({task.equivalenceClasses.length})
                 </span>
               </div>
               <div className="space-y-1.5 max-h-64 overflow-y-auto custom-scrollbar">
@@ -171,7 +200,7 @@ export function TaskWorkspace({ task, testCasesCount = 0 }: TaskWorkspaceProps) 
               <div className="flex items-center gap-2">
                 <GitBranch className="h-3.5 w-3.5 text-amber-600" />
                 <span className="text-xs font-medium">
-                  Граничные значения ({task.boundaryValues.length})
+                  {t("trainer_bv_title")} ({task.boundaryValues.length})
                 </span>
               </div>
               <div className="flex flex-wrap gap-1.5">

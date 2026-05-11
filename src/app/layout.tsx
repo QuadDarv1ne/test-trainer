@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ThemeProvider } from "next-themes";
-import { Toaster } from "sonner";
+import { Providers } from "@/components/providers";
+import { translations } from "@/lib/translations";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,16 +15,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Тренажёр тестирования — Генератор тест-кейсов",
-  description: "Интерактивный тренажёр для изучения методов тестирования программного обеспечения: классы эквивалентности, граничные значения и генерация тест-кейсов.",
-  keywords: ["тестирование", "тест-кейсы", "эквивалентные классы", "граничные значения", "программное обеспечение"],
-  authors: [{ name: "Тренажёр тестирования" }],
+  title: translations.ru.layout_title,
+  description: translations.ru.layout_description,
+  keywords: [translations.ru.topic_ec, translations.ru.topic_bv, "тест-кейсы", "программное обеспечение"],
+  authors: [{ name: translations.ru.header_title }],
   icons: {
     icon: "/favicon.svg",
   },
   openGraph: {
-    title: "Тренажёр тестирования",
-    description: "Интерактивный тренажёр для изучения методов чёрного ящика",
+    title: translations.ru.layout_og_title,
+    description: translations.ru.layout_og_description,
     type: "website",
   },
 };
@@ -39,10 +39,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
-          <Toaster richColors position="bottom-right" />
-        </ThemeProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

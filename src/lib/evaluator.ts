@@ -304,10 +304,10 @@ function findCoveredEquivalenceClasses(
         if (ec.id === "ec2" && errors.includes("Минимум 8 символов") && errors.length === 1) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec3" && errors.some(e => e.includes("заглавную")) && !errors.includes("Минимум 8 символов") && errors.length <= 2) {
+        if (ec.id === "ec3" && errors.some(e => e.includes("заглавну")) && !errors.includes("Минимум 8 символов") && errors.length <= 2) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec4" && errors.some(e => e.includes("строчную")) && !errors.includes("Минимум 8 символов") && errors.length <= 2) {
+        if (ec.id === "ec4" && errors.some(e => e.includes("строчну")) && !errors.includes("Минимум 8 символов") && errors.length <= 2) {
           covered.push(ec.id);
         }
         if (ec.id === "ec5" && errors.some(e => e.includes("цифр")) && !errors.includes("Минимум 8 символов") && errors.length <= 2) {
@@ -326,6 +326,148 @@ function findCoveredEquivalenceClasses(
           covered.push(ec.id);
         }
       } else if (ec.id === "ec9" && error) {
+        covered.push(ec.id);
+      }
+    }
+
+    if (taskId === 7) {
+      // stringTransform
+      const s1 = inputs[0];
+      const s2 = inputs[1];
+      const start = Number(inputs[2]);
+      const length = Number(inputs[3]);
+
+      if (ec.id === "ec1" && !error && typeof s1 === "string" && typeof s2 === "string" && start >= 0 && start < s1.length && length > 0 && length <= s1.length - start) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec2" && !error && start === 0 && length > 0) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec3" && !error && typeof s1 === "string" && start >= s1.length) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec4" && !error && length === 0) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec5" && !error && typeof s1 === "string" && length > s1.length - start) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec6" && !error && typeof s1 === "string" && s1 === "") {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec7" && !error && typeof s2 === "string" && s2 === "") {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec8" && error && typeof start === "number" && start < 0) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec9" && error && typeof length === "number" && length < 0) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec10" && error && (typeof s1 !== "string" || typeof s2 !== "string")) {
+        covered.push(ec.id);
+      }
+    }
+
+    if (taskId === 8) {
+      // validateDate
+      const day = Number(inputs[0]);
+      const month = Number(inputs[1]);
+      const year = Number(inputs[2]);
+
+      if (result && typeof result === "object" && "valid" in result) {
+        const res = result as { valid: boolean; reason?: string };
+
+        if (ec.id === "ec1" && res.valid) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec2" && res.valid && month === 2 && day === 29) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec3" && !res.valid && res.reason?.includes("не более") && month === 2 && day === 29) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec4" && !res.valid && res.reason?.includes("не более") && month === 4 && day === 31) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec5" && !res.valid && res.reason?.includes("Месяц")) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec6" && !res.valid && res.reason?.includes("День")) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec7" && !res.valid && res.reason?.includes("Год")) {
+          covered.push(ec.id);
+        }
+      }
+      if (ec.id === "ec8" && error) {
+        covered.push(ec.id);
+      }
+    }
+
+    if (taskId === 9) {
+      // sortAndFilter
+      if (ec.id === "ec1" && !error && Array.isArray(inputs[0]) && (inputs[0] as number[]).every(n => n >= 0)) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec2" && !error && Array.isArray(inputs[0]) && (inputs[0] as number[]).some(n => n < 0) && (inputs[0] as number[]).some(n => n >= 0)) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec3" && !error && Array.isArray(inputs[0]) && (inputs[0] as number[]).length === 0) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec4" && !error && Array.isArray(inputs[0]) && (inputs[0] as number[]).length === 1) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec5" && !error && Array.isArray(inputs[0]) && (inputs[0] as number[]).every(n => n < 0)) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec6" && !error && Array.isArray(inputs[0]) && new Set(inputs[0]).size < (inputs[0] as number[]).length) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec7" && error && Array.isArray(inputs[0]) && (inputs[0] as unknown[]).some(v => typeof v === "number" && isNaN(v))) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec8" && error && !Array.isArray(inputs[0])) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec9" && error && Array.isArray(inputs[0]) && (inputs[0] as number[]).length > 1000) {
+        covered.push(ec.id);
+      }
+    }
+
+    if (taskId === 10) {
+      // validateEmail
+      if (result && typeof result === "object" && "valid" in result) {
+        const res = result as { valid: boolean; reason?: string };
+        const email = String(inputs[0]);
+
+        if (ec.id === "ec1" && res.valid) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec2" && !res.valid && res.reason?.includes("Пуст")) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec3" && !res.valid && res.reason?.includes("длинн")) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec4" && !res.valid && res.reason?.includes("@")) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec5" && !res.valid && res.reason?.includes("локальн")) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec6" && !res.valid && res.reason?.includes("домен") && !res.reason?.includes("уровн")) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec7" && !res.valid && res.reason?.includes("уровн")) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec8" && !res.valid && email.includes("@") && email.includes(" ")) {
+          covered.push(ec.id);
+        }
+      }
+      if (ec.id === "ec9" && error) {
         covered.push(ec.id);
       }
     }
