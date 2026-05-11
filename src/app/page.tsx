@@ -75,10 +75,10 @@ export default function Home() {
           <TabNavigation />
 
           <AnimatePresence mode="wait">
-            <TasksTab />
-            <TrainerTab />
-            <ResultsTab />
-            <TheoryTab />
+            <TasksTab key="tasks" />
+            <TrainerTab key="trainer" />
+            <ResultsTab key="results" />
+            <TheoryTab key="theory" />
             <TabsContent key="statistics" value="statistics">
               <StatisticsPanel />
             </TabsContent>
