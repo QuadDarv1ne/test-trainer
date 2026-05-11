@@ -12,6 +12,7 @@ interface Particle {
   velocityX: number;
   velocityY: number;
   rotationSpeed: number;
+  isCircle: boolean;
 }
 
 const COLORS = [
@@ -44,6 +45,7 @@ export function Confetti({ active }: { active: boolean }) {
       velocityX: (Math.random() - 0.5) * 6,
       velocityY: Math.random() * 3 + 2,
       rotationSpeed: (Math.random() - 0.5) * 15,
+      isCircle: Math.random() > 0.5,
     }));
 
     setParticles(newParticles);
@@ -87,7 +89,7 @@ export function Confetti({ active }: { active: boolean }) {
             width: `${p.size}px`,
             height: `${p.size}px`,
             backgroundColor: p.color,
-            borderRadius: Math.random() > 0.5 ? "50%" : "2px",
+            borderRadius: p.isCircle ? "50%" : "2px",
             transform: `rotate(${p.rotation}deg)`,
             opacity: 0.9,
           }}
