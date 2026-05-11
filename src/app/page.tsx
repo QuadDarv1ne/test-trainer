@@ -30,8 +30,6 @@ const pageVariants = {
   exit: { opacity: 0, x: -20 },
 };
 
-let nextTestCaseId = 1;
-
 function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const isDark = theme === "dark";
@@ -80,7 +78,7 @@ export default function Home() {
   const handleAddTestCase = useCallback(
     (inputs: string[], expected: string, category: TestCaseCategory, comment: string) => {
       const newCase: TestCase = {
-        id: `tc-${nextTestCaseId++}`,
+        id: `tc-${crypto.randomUUID()}`,
         inputs,
         expectedOutput: expected,
         category,
@@ -276,10 +274,9 @@ export default function Home() {
 
           <AnimatePresence mode="wait">
             {/* Tasks tab */}
-            <TabsContent key="tasks-content" value="tasks" forceMount>
-              {activeTab === "tasks" && (
-                <motion.div key="tasks" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
-                  <div className="mb-4 sm:mb-6">
+            <TabsContent key="tasks" value="tasks">
+              <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
+                <div className="mb-4 sm:mb-6">
                     <h2 className="text-lg sm:text-xl font-semibold mb-1">Выберите задание</h2>
                     <p className="text-sm text-muted-foreground">
                       Выберите функцию для тестирования. Каждое задание содержит описание, классы эквивалентности и граничные значения.
@@ -297,13 +294,12 @@ export default function Home() {
                     ))}
                   </div>
                 </motion.div>
-              )}
-            </TabsContent>
+              </TabsContent>
 
             {/* Trainer tab */}
-            <TabsContent key="trainer-content" value="trainer" forceMount>
-              {activeTab === "trainer" && selectedTask && (
-                <motion.div key="trainer" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
+            <TabsContent key="trainer" value="trainer">
+              {selectedTask && (
+                <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
                   <div className="flex items-center gap-2 mb-4 sm:mb-6">
                     <Button variant="ghost" size="sm" onClick={handleBackToTasks} className="text-muted-foreground">
                       <ArrowLeft className="h-4 w-4 mr-1" />
@@ -325,11 +321,9 @@ export default function Home() {
                 </motion.div>
               )}
             </TabsContent>
-
-            {/* Results tab */}
-            <TabsContent key="results-content" value="results" forceMount>
-              {activeTab === "results" && (
-                <motion.div key="results" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
+            <TabsContent key="results" value="results">
+              {evaluationResult && (
+                <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
                   <div className="mb-4 sm:mb-6">
                     <h2 className="text-lg sm:text-xl font-semibold mb-1">Результаты проверки</h2>
                     <p className="text-sm text-muted-foreground">
@@ -344,10 +338,9 @@ export default function Home() {
             </TabsContent>
 
             {/* Theory tab */}
-            <TabsContent key="theory-content" value="theory" forceMount>
-              {activeTab === "theory" && (
-                <motion.div key="theory" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
-                  <div className="mb-4 sm:mb-6">
+            <TabsContent key="theory" value="theory">
+              <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
+                <div className="mb-4 sm:mb-6">
                     <h2 className="text-lg sm:text-xl font-semibold mb-1">Теория тестирования</h2>
                     <p className="text-sm text-muted-foreground">
                       Изучите основные методы тестирования «чёрного ящика» перед выполнением заданий.
@@ -357,25 +350,16 @@ export default function Home() {
                     <TheoryPanel />
                   </div>
                 </motion.div>
-              )}
+              </TabsContent>
+            <TabsContent key="statistics" value="statistics">
+              <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
+                <StatisticsPanel />
+              </motion.div>
             </TabsContent>
-
-            {/* Statistics tab */}
-            <TabsContent key="statistics-content" value="statistics" forceMount>
-              {activeTab === "statistics" && (
-                <motion.div key="statistics" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
-                  <StatisticsPanel />
-                </motion.div>
-              )}
-            </TabsContent>
-
-            {/* Achievements tab */}
-            <TabsContent key="achievements-content" value="achievements" forceMount>
-              {activeTab === "achievements" && (
-                <motion.div key="achievements" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
-                  <AchievementsPanel />
-                </motion.div>
-              )}
+            <TabsContent key="achievements" value="achievements">
+              <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
+                <AchievementsPanel />
+              </motion.div>
             </TabsContent>
           </AnimatePresence>
         </Tabs>
