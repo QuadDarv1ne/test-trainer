@@ -235,14 +235,14 @@ export default function Home() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-6 mb-4 sm:mb-6 h-auto p-1 bg-muted/50">
+          <TabsList className="w-full mb-4 sm:mb-6 h-auto p-1 bg-muted/50 overflow-x-auto flex justify-start gap-1 [&>button]:flex-1 [&>button]:min-w-0">
             <TabsTrigger
               value="tasks"
               className="text-xs sm:text-sm py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white"
             >
               <ListChecks className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              <span className="hidden xs:inline sm:inline">Задания</span>
-              <span className="xs:hidden sm:hidden">Зад</span>
+              <span className="hidden sm:inline">Задания</span>
+              <span className="sm:hidden">Зад</span>
             </TabsTrigger>
             <TabsTrigger
               value="trainer"
@@ -250,8 +250,8 @@ export default function Home() {
               disabled={!selectedTask}
             >
               <Dumbbell className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              <span className="hidden xs:inline sm:inline">Тренажёр</span>
-              <span className="xs:hidden sm:hidden">Тр</span>
+              <span className="hidden sm:inline">Тренажёр</span>
+              <span className="sm:hidden">Тр</span>
             </TabsTrigger>
             <TabsTrigger
               value="results"
@@ -259,32 +259,32 @@ export default function Home() {
               disabled={!evaluationResult}
             >
               <BarChart3 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              <span className="hidden xs:inline sm:inline">Результаты</span>
-              <span className="xs:hidden sm:hidden">Рез</span>
+              <span className="hidden sm:inline">Результаты</span>
+              <span className="sm:hidden">Рез</span>
             </TabsTrigger>
             <TabsTrigger
               value="theory"
               className="text-xs sm:text-sm py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white"
             >
               <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              <span className="hidden xs:inline sm:inline">Теория</span>
-              <span className="xs:hidden sm:hidden">Т</span>
+              <span className="hidden sm:inline">Теория</span>
+              <span className="sm:hidden">Т</span>
             </TabsTrigger>
             <TabsTrigger
               value="statistics"
               className="text-xs sm:text-sm py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white"
             >
               <BarChart3 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              <span className="hidden xs:inline sm:inline">Статистика</span>
-              <span className="hidden sm:inline">С</span>
+              <span className="hidden sm:inline">Статистика</span>
+              <span className="sm:hidden">Ст</span>
             </TabsTrigger>
             <TabsTrigger
               value="achievements"
               className="text-xs sm:text-sm py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white"
             >
               <Trophy className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              <span className="hidden xs:inline sm:inline">Достижения</span>
-              <span className="hidden sm:hidden">Д</span>
+              <span className="hidden sm:inline">Достижения</span>
+              <span className="sm:hidden">Д</span>
             </TabsTrigger>
           </TabsList>
 
@@ -331,7 +331,7 @@ export default function Home() {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                     {/* Left panel - task description */}
                     <div className="lg:max-h-[calc(100vh-240px)]">
-                      <TaskWorkspace task={selectedTask} />
+                      <TaskWorkspace task={selectedTask} testCasesCount={testCases.length} />
                     </div>
                     {/* Right panel - test form and list */}
                     <div className="space-y-4">
