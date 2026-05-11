@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Code2,
@@ -10,14 +12,31 @@ import {
   Layers,
   GitBranch,
   Info,
+  Lightbulb,
 } from "lucide-react";
 import type { Task } from "@/lib/tasks";
 
 interface TaskWorkspaceProps {
   task: Task;
+  testCasesCount?: number;
 }
 
-export function TaskWorkspace({ task }: TaskWorkspaceProps) {
+export function TaskWorkspace({ task, testCasesCount = 0 }: TaskWorkspaceProps) {
+  const [hintIndex, setHintIndex] = useState(0);
+
+  // Generate hints from uncovered ECs and BVs
+  const allHints = [
+    ...task.equivalenceClasses.map((ec) => ({
+      type: "ec" as const,
+      text: `Попробуйте класс: ${ec.name} — ${ec.description}. Пример: ${JSON.stringify(ec.exampleValues[0])}`,
+    })),
+    ...task.boundaryValues.map((bv) => ({
+      type: "bv" as const,
+      text: `Проверьте граничное значение: ${Array.isArray(bv.value) ? `[${bv.value.join(", ")}]` : bv.value} — ${bv.description}`,
+    })),
+  ];
+
+  const showHint = testCasesCount > 0 && hintIndex < allHints.length;
   return (
     <ScrollArea className="h-full">
       <div className="space-y-4 pr-4">
@@ -94,6 +113,32 @@ export function TaskWorkspace({ task }: TaskWorkspaceProps) {
                 <code>{task.code}</code>
               </pre>
             </div>
+
+            {/* Progressive hint */}
+            {showHint && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
+                    <span className="text-xs font-medium">Подсказка</span>
+                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                      {hintIndex + 1}/{allHints.length}
+                    </Badge>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs h-7 px-2"
+                    onClick={() => setHintIndex((i) => i + 1)}
+                  >
+                    Следующая →
+                  </Button>
+                </div>
+                <div className="text-xs bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md p-2.5 text-amber-800 dark:text-amber-300">
+                  {allHints[hintIndex].text}
+                </div>
+              </div>
+            )}
 
             {/* Equivalence classes */}
             <div className="space-y-2">

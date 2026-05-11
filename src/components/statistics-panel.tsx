@@ -18,6 +18,17 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { format } from "date-fns";
+import { ru } from "date-fns/locale";
 
 export function StatisticsPanel() {
   const [streak] = useState<StreakData>(() => loadStreak());
@@ -66,6 +77,46 @@ export function StatisticsPanel() {
           </span>
         )}
       </div>
+
+      {/* Score progress chart */}
+      {attempts.length > 0 && (
+        <Card>
+          <CardContent className="pt-6">
+            <h3 className="text-sm font-semibold mb-3">Прогресс баллов</h3>
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart
+                data={attempts.slice(-20).map((a, i) => ({
+                  index: i + 1,
+                  score: a.score,
+                  date: format(new Date(a.timestamp), "dd MMM HH:mm", { locale: ru }),
+                  task: tasks.find((t) => t.id === a.taskId)?.name ?? `#${a.taskId}`,
+                }))}
+                margin={{ top: 5, right: 10, left: -20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis dataKey="index" className="text-xs" tick={{ fontSize: 10 }} />
+                <YAxis domain={[0, 100]} className="text-xs" tick={{ fontSize: 10 }} />
+                <Tooltip
+                  formatter={(value: number) => [`${value}%`, "Балл"]}
+                  labelFormatter={(_, payload) => {
+                    const item = payload?.[0]?.payload;
+                    return item ? `${item.task} — ${item.date}` : `Попытка ${_ + 1}`;
+                  }}
+                  contentStyle={{ fontSize: 12 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="score"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 5 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-3 gap-4 text-center">
         <div>
