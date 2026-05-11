@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Flame, Trash2 } from "lucide-react";
+import { Flame, Trash2, Download } from "lucide-react";
+import { downloadJSON, downloadCSV } from "@/lib/export";
 import { tasks } from "@/lib/tasks";
 import { loadStreak, loadAttempts, type StreakData } from "@/lib/storage";
 import { useAppStore } from "@/lib/store";
@@ -135,6 +136,24 @@ export function StatisticsPanel() {
           </p>
           <p className="text-xs text-muted-foreground">{t("stats_excellent")}</p>
         </div>
+      </div>
+
+      {/* Export buttons */}
+      <div className="flex justify-center gap-2 pt-2">
+        <button
+          onClick={() => { downloadJSON(); toast.success(t("toast_export_json")); }}
+          className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 transition-colors"
+        >
+          <Download className="h-3 w-3" />
+          {t("stats_export_json")}
+        </button>
+        <button
+          onClick={() => { downloadCSV(); toast.success(t("toast_export_csv")); }}
+          className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 transition-colors"
+        >
+          <Download className="h-3 w-3" />
+          {t("stats_export_csv")}
+        </button>
       </div>
 
       {/* Reset progress */}

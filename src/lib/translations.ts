@@ -161,6 +161,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     stats_reset_desc: "Это действие удалит все ваши результаты, статистику и достижения. Действие нельзя отменить.",
     stats_reset_cancel: "Отмена",
     stats_reset_confirm: "Сбросить",
+    stats_export_json: "Экспорт JSON",
+    stats_export_csv: "Экспорт CSV",
 
     // Keyboard shortcuts
     shortcuts_title: "Горячие клавиши",
@@ -433,6 +435,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     stats_reset_desc: "This will delete all your results, statistics, and achievements. This action cannot be undone.",
     stats_reset_cancel: "Cancel",
     stats_reset_confirm: "Reset",
+    stats_export_json: "Export JSON",
+    stats_export_csv: "Export CSV",
 
     // Keyboard shortcuts
     shortcuts_title: "Keyboard Shortcuts",
