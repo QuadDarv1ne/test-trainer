@@ -209,12 +209,7 @@ export function clearAllProgress(): void {
     const keysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (
-        key &&
-        (key.startsWith("test-trainer-") ||
-          key.startsWith(SESSION_PREFIX) ||
-          key.startsWith("test-trainer-session-"))
-      ) {
+      if (key && key.startsWith("test-trainer-")) {
         keysToRemove.push(key);
       }
     }
