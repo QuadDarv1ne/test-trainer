@@ -47,11 +47,17 @@ export function TestForm({ task, onAdd }: TestFormProps) {
 
   // Reset form when task changes
   const paramCount = task.params.length;
+
   useEffect(() => {
     setInputs(emptyInputs(task.params));
     setExpected("");
     setComment("");
     setCategory("Нормальное значение");
+    // Focus first input after form reset
+    requestAnimationFrame(() => {
+      const firstInput = document.querySelector('input[type="text"], input:not([type])') as HTMLInputElement;
+      firstInput?.focus();
+    });
   }, [paramCount]);
 
   const handleSubmit = (e: React.FormEvent) => {

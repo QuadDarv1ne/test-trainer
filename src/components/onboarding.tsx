@@ -114,7 +114,7 @@ export function Onboarding() {
                     i === step
                       ? "w-6 bg-emerald-500"
                       : i < step
-                      ? "w-1.5 bg-embrald-300 dark:bg-emerald-700"
+                      ? "w-1.5 bg-emerald-300 dark:bg-emerald-700"
                       : "w-1.5 bg-muted"
                   }`}
                 />
