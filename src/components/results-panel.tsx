@@ -23,11 +23,18 @@ import {
   ArrowRight,
   Copy,
   Check,
+  Download,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { EvaluationResult } from "@/lib/evaluator";
 import { categoryColors } from "./test-form";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface ResultsPanelProps {
   result: EvaluationResult | null;
@@ -157,6 +164,78 @@ export function ResultsPanel({ result, onReset }: ResultsPanelProps) {
     } catch {
       toast.error("Не удалось скопировать результаты");
     }
+  };
+
+  const exportJSON = () => {
+    if (!result) return;
+    const grade = getGrade(result.overallScore);
+    const data = {
+      task: result.task.name,
+      taskId: result.task.id,
+      overallScore: result.overallScore,
+      grade: grade.text,
+      metrics: {
+        equivalenceClasses: { score: result.ecCoverage, covered: result.coveredEcsCount, total: result.totalEcs },
+        boundaryValues: { score: result.boundaryCoverage, covered: result.coveredBvsCount, total: result.totalBvs },
+        correctness: result.correctnessScore,
+      },
+      testCases: result.results.map((r, idx) => ({
+        index: idx + 1,
+        inputs: r.testCase.inputs,
+        expected: r.testCase.expectedOutput,
+        actual: r.actualOutput,
+        isCorrect: r.isCorrect,
+        coveredClasses: r.coveredClasses,
+      })),
+      uncoveredEcIds: result.uncoveredEcIds,
+      uncoveredBvDescriptions: result.uncoveredBvDescriptions,
+      timestamp: new Date().toISOString(),
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `result-task-${result.task.id}-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Экспорт в JSON завершён");
+  };
+
+  const exportCSV = () => {
+    if (!result) return;
+    const grade = getGrade(result.overallScore);
+    const rows: string[] = [];
+    rows.push("Метрика,Значение");
+    rows.push(`Задание,${result.task.name}`);
+    rows.push(`Общая оценка,${result.overallScore}%`);
+    rows.push(`Оценка,${grade.text}`);
+    rows.push(`Классы эквивалентности,${result.ecCoverage}% (${result.coveredEcsCount}/${result.totalEcs})`);
+    rows.push(`Граничные значения,${result.boundaryCoverage}% (${result.coveredBvsCount}/${result.totalBvs})`);
+    rows.push(`Корректность,${result.correctnessScore}%`);
+    rows.push("");
+    rows.push("№,Вход,Ожидание,Факт,Статус,Покрытые классы");
+    result.results.forEach((r, idx) => {
+      const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
+      rows.push(
+        `${idx + 1},${escape(r.testCase.inputs.join(", "))},${escape(r.testCase.expectedOutput)},${escape(r.actualOutput)},${r.isCorrect ? "Верно" : "Неверно"},${escape(r.coveredClasses.join(", "))}`
+      );
+    });
+    if (result.uncoveredEcIds.length > 0) {
+      rows.push("");
+      rows.push("Непокрытые классы эквивалентности");
+      for (const id of result.uncoveredEcIds) {
+        const ec = result.task.equivalenceClasses.find((e) => e.id === id);
+        if (ec) rows.push(`- ${ec.name}: ${ec.description}`);
+      }
+    }
+    const blob = new Blob(["\uFEFF" + rows.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `result-task-${result.task.id}-${Date.now()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Экспорт в CSV завершён");
   };
 
   if (!result) {
@@ -335,19 +414,37 @@ export function ResultsPanel({ result, onReset }: ResultsPanelProps) {
             <CardTitle className="text-sm font-semibold">
               Детальные результаты
             </CardTitle>
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-xs gap-1.5"
-              onClick={handleCopy}
-            >
-              {copied ? (
-                <Check className="h-3.5 w-3.5 text-emerald-600" />
-              ) : (
-                <Copy className="h-3.5 w-3.5" />
-              )}
-              {copied ? "Скопировано" : "Копировать результаты"}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs gap-1.5"
+                onClick={handleCopy}
+              >
+                {copied ? (
+                  <Check className="h-3.5 w-3.5 text-emerald-600" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
+                {copied ? "Скопировано" : "Копировать"}
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="text-xs gap-1.5">
+                    <Download className="h-3.5 w-3.5" />
+                    Экспорт
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={exportJSON}>
+                    Экспорт в JSON
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={exportCSV}>
+                    Экспорт в CSV
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">
