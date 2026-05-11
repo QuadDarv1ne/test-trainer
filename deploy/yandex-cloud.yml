@@ -1,0 +1,30 @@
+# Yandex Cloud — Serverless Containers
+# Deploy: yc serverless container deploy test-trainer --docker-image cr.yandex/$FOLDER_ID/test-trainer:latest
+# Docs: https://cloud.yandex.ru/docs/serverless-containers/quickstart/container-deploy
+
+service: test-trainer
+runtime:
+  type: serverless-container
+  container:
+    image: cr.yandex/${FOLDER_ID}/test-trainer:latest
+    cpu: 1
+    memory: 512MB
+    concurrency: 4
+    execution_timeout: 60s
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+    volumes: []
+    service_account_id: ${SERVICE_ACCOUNT_ID}
+
+network:
+  endpoint:
+    type: public
+    dns:
+      fqdn: test-trainer.example.com
+      folder_id: ${FOLDER_ID}
+
+revision_options:
+  log_group_id: ${LOG_GROUP_ID}
+  storage_size_mb: 512
+  tmpfs_size_mb: 128

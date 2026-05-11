@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: test-trainer
+    env: docker
+    dockerfilePath: ./deploy/Dockerfile.prod
+    healthCheckPath: /
+    startCommand: bun server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+    autoDeploy: true
+    disk:
+      name: data
+      mountPath: /app/data
+      sizeGB: 1
