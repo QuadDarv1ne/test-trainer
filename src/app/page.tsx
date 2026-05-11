@@ -149,7 +149,6 @@ export default function Home() {
           e.preventDefault();
           const lastCase = testCases[testCases.length - 1];
           handleRemoveTestCase(lastCase.id);
-          toast.info("Последний тест-кейс удалён");
         }
       }
       // Escape to reset
@@ -157,7 +156,6 @@ export default function Home() {
         if (activeTab === "trainer" && testCases.length > 0) {
           e.preventDefault();
           handleReset();
-          toast.info("Сессия сброшена");
         }
       }
     };
