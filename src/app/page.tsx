@@ -78,7 +78,7 @@ export default function Home() {
   const handleAddTestCase = useCallback(
     (inputs: string[], expected: string, category: TestCaseCategory, comment: string) => {
       const newCase: TestCase = {
-        id: `tc-${crypto.randomUUID()}`,
+        id: `tc-${crypto.randomUUID?.() ?? Date.now().toString(36) + Math.random().toString(36).slice(2)}`,
         inputs,
         expectedOutput: expected,
         category,
@@ -133,19 +133,37 @@ export default function Home() {
     setActiveTab("tasks");
   }, []);
 
-  // Keyboard shortcut: Ctrl+Enter to submit
+  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+Enter to submit
       if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
         e.preventDefault();
         if (activeTab === "trainer" && selectedTask && testCases.length > 0) {
           handleSubmit();
         }
       }
+      // Ctrl+Z to remove last test case
+      if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
+        if (activeTab === "trainer" && testCases.length > 0) {
+          e.preventDefault();
+          const lastCase = testCases[testCases.length - 1];
+          handleRemoveTestCase(lastCase.id);
+          toast.info("Последний тест-кейс удалён");
+        }
+      }
+      // Escape to reset
+      if (e.key === "Escape") {
+        if (activeTab === "trainer" && testCases.length > 0) {
+          e.preventDefault();
+          handleReset();
+          toast.info("Сессия сброшена");
+        }
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeTab, selectedTask, testCases, handleSubmit]);
+  }, [activeTab, selectedTask, testCases, handleSubmit, handleRemoveTestCase, handleReset]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 dark:from-zinc-950 dark:via-zinc-900 dark:to-emerald-950/20">
