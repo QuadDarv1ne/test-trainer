@@ -112,15 +112,31 @@ export function TestList({ testCases, onRemove, onSubmit }: TestListProps) {
           </Table>
         </div>
       </CardContent>
-      {/* Keyboard shortcut hint */}
-      <div className="px-4 pb-3 flex items-center gap-1.5 text-[10px] text-muted-foreground">
-        <Keyboard className="h-3 w-3" />
-        <span>
-          <kbd className="px-1 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[9px]">Ctrl</kbd>
-          {" + "}
-          <kbd className="px-1 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[9px]">Enter</kbd>
-          {" — для проверки"}
-        </span>
+      {/* Keyboard shortcut hints */}
+      <div className="px-4 pb-3 flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-muted-foreground">
+        <div className="flex items-center gap-1.5">
+          <Keyboard className="h-3 w-3" />
+          <span>
+            <kbd className="px-1 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[9px]">Ctrl</kbd>
+            {" + "}
+            <kbd className="px-1 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[9px]">Enter</kbd>
+            {" — проверить"}
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span>
+            <kbd className="px-1 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[9px]">Ctrl</kbd>
+            {" + "}
+            <kbd className="px-1 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[9px]">Z</kbd>
+            {" — отменить последний"}
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span>
+            <kbd className="px-1 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[9px]">Esc</kbd>
+            {" — сбросить всё"}
+          </span>
+        </div>
       </div>
     </Card>
   );
