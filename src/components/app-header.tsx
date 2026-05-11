@@ -15,6 +15,22 @@ import {
 
 function ThemeToggle() {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+  if (!mounted) {
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-9 w-9 text-muted-foreground hover:text-foreground"
+        disabled
+      >
+        <Sun className="h-4 w-4" />
+      </Button>
+    );
+  }
   const isDark = theme === "dark";
   return (
     <Button
@@ -22,7 +38,6 @@ function ThemeToggle() {
       size="icon"
       className="h-9 w-9 text-muted-foreground hover:text-foreground"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      suppressHydrationWarning
     >
       {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
     </Button>
