@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Flame, Trash2, Download } from "lucide-react";
 import { downloadJSON, downloadCSV } from "@/lib/export";
 import { tasks } from "@/lib/tasks";
-import { loadStreak, loadAttempts, loadProgress, type StreakData } from "@/lib/storage";
 import { useAppStore } from "@/lib/store";
 import { toast } from "sonner";
 import {
@@ -34,14 +32,19 @@ import { useLocale } from "@/lib/i18n.client";
 
 export function StatisticsPanel() {
   const { t, locale } = useLocale();
-  const [streak] = useState<StreakData>(() => loadStreak());
-  const attempts = loadAttempts();
+  const savedProgress = useAppStore((s) => s.savedProgress);
+  const loadAttemptsFn = useAppStore((s) => s.loadAttempts);
+  const loadStreakFn = useAppStore((s) => s.loadStreak);
+
+  // Refresh data from storage whenever savedProgress changes (i.e. after submission)
+  const attempts = loadAttemptsFn();
+  const streak = loadStreakFn();
   const totalAttempts = attempts.length;
   const avgOverallScore = totalAttempts > 0
     ? Math.round(attempts.reduce((s, a) => s + a.score, 0) / totalAttempts)
     : 0;
 
-  const progress = loadProgress();
+  const progress = savedProgress;
   const completedWithExcellent = tasks.filter((task) => {
     const p = progress[task.id];
     return p && p.score >= 90;

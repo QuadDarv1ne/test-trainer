@@ -104,6 +104,15 @@ export const useAppStore = create<AppState>((set, get) => ({
     const result = evaluateTestCases(state.selectedTask, state.testCases);
     set({ evaluationResult: result });
     saveProgressToStorage(state.selectedTask.id, result.overallScore, state.testCases);
+    saveAttempt({
+      taskId: state.selectedTask.id,
+      score: result.overallScore,
+      ecCoverage: result.ecCoverage,
+      bvCoverage: result.boundaryCoverage,
+      correctnessScore: result.correctnessScore,
+      timestamp: Date.now(),
+      testCasesCount: state.testCases.length,
+    });
     set({ savedProgress: loadProgressFromStorage() });
     return result;
   },
