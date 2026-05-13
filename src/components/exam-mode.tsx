@@ -61,6 +61,19 @@ export function ExamMode() {
 
   const completedCount = examResults.length;
 
+  const triggerConfetti = useCallback((results: EvaluationResult[]) => {
+    const avg =
+      results.length > 0
+        ? Math.round(
+            results.reduce((s, r) => s + r.overallScore, 0) / results.length
+          )
+        : 0;
+    if (avg >= 90) {
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 3500);
+    }
+  }, []);
+
   const finishExam = useCallback(() => {
     // Submit remaining unsent tasks — use refs to get latest values
     const results = [...examResultsRef.current];
@@ -88,18 +101,8 @@ export function ExamMode() {
     setExamResults(results);
     setExamState("results");
     window.dispatchEvent(new Event("achievements-updated"));
-    // Check confetti
-    const newAvg =
-      results.length > 0
-        ? Math.round(
-            results.reduce((s, r) => s + r.overallScore, 0) / results.length
-          )
-        : 0;
-    if (newAvg >= 90) {
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 3500);
-    }
-  }, []);
+    triggerConfetti(results);
+  }, [triggerConfetti]);
 
   useEffect(() => {
     finishExamRef.current = finishExam;
@@ -192,22 +195,13 @@ export function ExamMode() {
       setExamExpected("");
       toast.success(t("exam_task_checked").replace("{name}", task.name).replace("{score}", String(result.overallScore)));
     } else {
+      const allResults = [...examResults, result];
+      setExamResults(allResults);
       setExamState("results");
       window.dispatchEvent(new Event("achievements-updated"));
-      // Check confetti
-      const newAvg = [...examResults, result];
-      const newAvgScore =
-        newAvg.length > 0
-          ? Math.round(
-              newAvg.reduce((s, r) => s + r.overallScore, 0) / newAvg.length
-            )
-          : 0;
-      if (newAvgScore >= 90) {
-        setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 3500);
-      }
+      triggerConfetti(allResults);
     }
-  }, [examTasks, currentTaskIndex, examTestCases, examResults, t]);
+  }, [examTasks, currentTaskIndex, examTestCases, examResults, t, triggerConfetti]);
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60);
@@ -221,20 +215,6 @@ export function ExamMode() {
           examResults.reduce((s, r) => s + r.overallScore, 0) / examResults.length
         )
       : 0;
-
-  // Confetti trigger when entering results with avg >= 90
-  const handleExamConfetti = useCallback(() => {
-    const newAvg =
-      examResults.length > 0
-        ? Math.round(
-            examResults.reduce((s, r) => s + r.overallScore, 0) / examResults.length
-          )
-        : 0;
-    if (newAvg >= 90) {
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 3500);
-    }
-  }, [examResults]);
 
   const timePerTask = selectedTasks.length > 0
     ? Math.round((timeLimit * 60) / selectedTasks.length)

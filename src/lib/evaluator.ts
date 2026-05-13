@@ -471,6 +471,126 @@ function findCoveredEquivalenceClasses(
         covered.push(ec.id);
       }
     }
+    if (taskId === 11) {
+      // passwordStrength
+      const pw = String(inputs[0] ?? "");
+      if (ec.id === "ec1" && !error && pw === "") {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec2" && !error && pw.length >= 1 && pw.length <= 3) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec3" && !error && pw.length >= 4 && pw.length <= 7) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec4" && !error && pw.length >= 8 && pw.length <= 11) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec5" && !error && pw.length >= 12) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec6" && !error && typeof result === "number" && result === 100) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec7" && !error && pw.length >= 4 && /^[a-zа-яё]+$/.test(pw)) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec8" && !error && pw.length >= 4 && /^[A-ZА-ЯЁ]+$/.test(pw)) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec9" && !error && pw.length >= 4 && /^[0-9]+$/.test(pw)) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec10" && error) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec11" && error && typeof inputs[0] === "string" && (inputs[0] as string).length > 128) {
+        covered.push(ec.id);
+      }
+    }
+
+    if (taskId === 12) {
+      // calculateShipping
+      const weight = Number(inputs[0]);
+      const distance = Number(inputs[1]);
+      if (ec.id === "ec1" && !error && weight > 0 && weight <= 1) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec2" && !error && weight > 1 && weight <= 5) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec3" && !error && weight > 5 && weight <= 20) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec4" && !error && weight > 20) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec5" && !error && distance > 0 && distance <= 10) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec6" && !error && distance > 10 && distance <= 50) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec7" && !error && distance > 50) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec8" && error && typeof weight === "number" && weight <= 0) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec9" && error && typeof distance === "number" && distance <= 0) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec10" && error && typeof weight === "number" && weight > 100) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec11" && error && typeof distance === "number" && distance > 5000) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "ec12" && error && (typeof inputs[0] !== "number" || typeof inputs[1] !== "number")) {
+        covered.push(ec.id);
+      }
+    }
+
+    if (taskId === 13) {
+      // validatePhone
+      const phone = String(inputs[0] ?? "");
+      if (result && typeof result === "object" && "valid" in result) {
+        const res = result as { valid: boolean; reason?: string };
+        const digits = phone.replace(/[\s\-()]/g, "");
+        const digitCount = digits.length - 1;
+
+        if (ec.id === "ec1" && res.valid) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec2" && !res.valid && res.reason?.includes("Пуст")) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec3" && !res.valid && !phone.startsWith("+")) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec4" && !res.valid && res.reason?.includes("коротк")) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec5" && !res.valid && res.reason?.includes("длинн")) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec6" && res.valid && (phone.includes("-") || phone.includes(" ") || phone.includes("("))) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec7" && !res.valid && res.reason?.includes("Разрешены")) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec8" && !res.valid && phone === "+") {
+          covered.push(ec.id);
+        }
+        if (ec.id === "ec9" && error) {
+          covered.push(ec.id);
+        }
+      }
+      if (ec.id === "ec9" && error) {
+        covered.push(ec.id);
+      }
+    }
   }
 
   return [...new Set(covered)];

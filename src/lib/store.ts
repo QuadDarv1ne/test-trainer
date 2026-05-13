@@ -93,7 +93,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (state.selectedTask) {
       saveCurrentSession(state.selectedTask.id, []);
     }
-    set({ testCases: [] });
+    set({ testCases: [], evaluationResult: null });
   },
 
   evaluationResult: null,
