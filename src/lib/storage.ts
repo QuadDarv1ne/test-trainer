@@ -205,14 +205,8 @@ export function loadStreak(): StreakData {
  * Очищает весь прогресс
  */
 export function clearAllProgress(): void {
-  try {
-    const keysToRemove = Object.keys(localStorage).filter((key) =>
-      key.startsWith("test-trainer-")
-    );
-    keysToRemove.forEach((key) => localStorage.removeItem(key));
-  } catch (e) {
-    if (e instanceof DOMException && e.name === "QuotaExceededError") {
-      toast.error("Хранилище браузера заполнено. Очистите данные сайта.");
-    }
-  }
+  const keysToRemove = Object.keys(localStorage).filter((key) =>
+    key.startsWith("test-trainer-")
+  );
+  keysToRemove.forEach((key) => localStorage.removeItem(key));
 }

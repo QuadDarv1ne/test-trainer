@@ -556,8 +556,6 @@ function findCoveredEquivalenceClasses(
       const phone = String(inputs[0] ?? "");
       if (result && typeof result === "object" && "valid" in result) {
         const res = result as { valid: boolean; reason?: string };
-        const digits = phone.replace(/[\s\-()]/g, "");
-        const _digitCount = digits.length - 1;
 
         if (ec.id === "ec1" && res.valid) {
           covered.push(ec.id);
