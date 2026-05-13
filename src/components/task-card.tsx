@@ -16,6 +16,9 @@ import {
   CalendarCheck,
   ArrowUpDown,
   Mail,
+  Shield,
+  Package,
+  Phone,
 } from "lucide-react";
 import { useLocale } from "@/lib/i18n.client";
 import { useAppStore } from "@/lib/store";
@@ -32,6 +35,20 @@ const taskIcons: Record<number, React.ReactNode> = {
   8: <CalendarCheck className="h-5 w-5" />,
   9: <ArrowUpDown className="h-5 w-5" />,
   10: <Mail className="h-5 w-5" />,
+  11: <Shield className="h-5 w-5" />,
+  12: <Package className="h-5 w-5" />,
+  13: <Phone className="h-5 w-5" />,
+};
+
+const TOPIC_I18N_MAP: Record<string, string | undefined> = {
+  "Классы эквивалентности": "topic_ec",
+  "Граничные значения": "topic_bv",
+  "Нелинейные классы": "topic_nonlinear",
+  "Многофакторное тестирование": "topic_multi",
+  "Логические условия": "topic_logic",
+  "Комбинаторное тестирование": "topic_combinatorial",
+  "Проверка форматов": "topic_formats",
+  "Таблицы решений": "topic_decision_tables",
 };
 
 interface TaskCardProps {
@@ -123,32 +140,15 @@ export function TaskCard({ task, isSelected: isSelectedProp, bestScore, onClick 
 
           <div className="flex flex-wrap gap-1">
             {task.topics.map((topic) => {
-              // Map Russian topic names to i18n keys
-              const topicTranslation =
-                topic === "Классы эквивалентности"
-                  ? t("topic_ec")
-                  : topic === "Граничные значения"
-                    ? t("topic_bv")
-                    : topic === "Нелинейные классы"
-                      ? t("topic_nonlinear")
-                      : topic === "Многофакторное тестирование"
-                        ? t("topic_multi")
-                        : topic === "Логические условия"
-                          ? t("topic_logic")
-                          : topic === "Комбинаторное тестирование"
-                            ? t("topic_combinatorial")
-                            : topic === "Проверка форматов"
-                              ? t("topic_formats")
-                              : topic === "Таблицы решений"
-                                ? t("topic_decision_tables")
-                                : topic;
+              const topicKey = TOPIC_I18N_MAP[topic];
+              const topicLabel = topicKey ? t(topicKey) : topic;
               return (
                 <Badge
                   key={topic}
                   variant="outline"
                   className="text-[10px] px-1.5 py-0"
                 >
-                  {topicTranslation}
+                  {topicLabel}
                 </Badge>
               );
             })}
