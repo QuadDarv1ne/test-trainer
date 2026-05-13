@@ -206,13 +206,9 @@ export function loadStreak(): StreakData {
  */
 export function clearAllProgress(): void {
   try {
-    const keysToRemove: string[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith("test-trainer-")) {
-        keysToRemove.push(key);
-      }
-    }
+    const keysToRemove = Object.keys(localStorage).filter((key) =>
+      key.startsWith("test-trainer-")
+    );
     keysToRemove.forEach((key) => localStorage.removeItem(key));
   } catch (e) {
     if (e instanceof DOMException && e.name === "QuotaExceededError") {
