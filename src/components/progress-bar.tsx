@@ -11,7 +11,7 @@ export function ProgressBar() {
   const savedProgress = useAppStore((s) => s.savedProgress);
 
   const completedCount = useMemo(() => {
-    return Object.keys(savedProgress).length;
+    return Object.values(savedProgress).filter((p) => p.score > 0).length;
   }, [savedProgress]);
 
   const totalTasks = tasks.length;

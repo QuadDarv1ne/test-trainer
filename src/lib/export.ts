@@ -32,7 +32,7 @@ export function generateExportJSON(): string {
   const attempts = loadAttempts();
   const progress = loadProgress();
   const streak = loadStreak();
-  const achievements = loadUnlockedAchievements();
+  const unlockedAchievementIds = loadUnlockedAchievements();
 
   const totalAttempts = attempts.length;
   const avgScore = totalAttempts > 0
@@ -59,12 +59,12 @@ export function generateExportJSON(): string {
       avgScore,
       currentStreak: streak.currentStreak,
       longestStreak: streak.longestStreak,
-      achievementsUnlocked: achievements.length,
+      achievementsUnlocked: unlockedAchievementIds.length,
       achievementsTotal: achievements.length,
     },
     bestProgress,
     attempts,
-    achievements,
+    achievements: unlockedAchievementIds,
   };
 
   return JSON.stringify(data, null, 2);

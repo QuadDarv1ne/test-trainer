@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Clock,
   CheckCircle2,
+  StopCircle,
 } from "lucide-react";
 import { Confetti } from "./confetti";
 import { tasks } from "@/lib/tasks";
@@ -359,6 +360,15 @@ export function ExamMode() {
               <CheckCircle2 className="h-3 w-3" />
               <span>{completedCount}/{examTasks.length}</span>
             </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-6 px-2 text-[10px] text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-900/20"
+              onClick={finishExam}
+            >
+              <StopCircle className="h-3 w-3 mr-1" />
+              {t("exam_finish")}
+            </Button>
           </div>
         </div>
 
