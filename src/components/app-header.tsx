@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useTheme } from "next-themes";
 import { useLocale } from "@/lib/i18n.client";
 import { Beaker, Sun, Moon, Keyboard } from "lucide-react";

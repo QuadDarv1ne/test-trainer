@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -117,6 +118,7 @@ export function TestList({
   onReorder: onReorderProp,
 }: TestListProps) {
   const { t } = useLocale();
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   const storeTestCases = useAppStore((s) => s.testCases);
   const storeRemove = useAppStore((s) => s.removeTestCase);

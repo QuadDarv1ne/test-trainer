@@ -108,16 +108,20 @@ export function ExamMode() {
     finishExamRef.current = finishExam;
   }, [finishExam]);
 
+  // Stable countdown interval — does not recreate on every tick
   useEffect(() => {
     if (examState !== "running") return;
-    if (timeRemaining <= 0) {
-      finishExamRef.current?.();
-      return;
-    }
     const interval = setInterval(() => {
       setTimeRemaining((t) => t - 1);
     }, 1000);
     return () => clearInterval(interval);
+  }, [examState]);
+
+  // Trigger finish when timer reaches zero
+  useEffect(() => {
+    if (examState === "running" && timeRemaining <= 0) {
+      finishExamRef.current?.();
+    }
   }, [examState, timeRemaining]);
 
   const toggleTask = (id: number) => {
