@@ -43,15 +43,32 @@ export function ExamMode() {
   const [examCategory, setExamCategory] = useState<string>("Нормальное значение");
   const [showConfetti, setShowConfetti] = useState(false);
   const finishExamRef = useRef<() => void>(null);
+  const examTestCasesRef = useRef(examTestCases);
+  const examResultsRef = useRef(examResults);
+  const examTasksRef = useRef(examTasks);
+
+  useEffect(() => {
+    examTestCasesRef.current = examTestCases;
+  }, [examTestCases]);
+
+  useEffect(() => {
+    examResultsRef.current = examResults;
+  }, [examResults]);
+
+  useEffect(() => {
+    examTasksRef.current = examTasks;
+  }, [examTasks]);
 
   const completedCount = examResults.length;
 
   const finishExam = useCallback(() => {
-    // Submit remaining unsent tasks
-    const results = [...examResults];
-    for (const task of examTasks) {
+    // Submit remaining unsent tasks — use refs to get latest values
+    const results = [...examResultsRef.current];
+    const currentTasks = examTasksRef.current;
+    const currentTestCases = examTestCasesRef.current;
+    for (const task of currentTasks) {
       if (!results.find((r) => r.task.id === task.id)) {
-        const tcs = examTestCases[task.id] || [];
+        const tcs = currentTestCases[task.id] || [];
         if (tcs.length > 0) {
           const result = evaluateTestCases(task, tcs);
           // Save each remaining task result to attempt history
@@ -82,7 +99,7 @@ export function ExamMode() {
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3500);
     }
-  }, [examResults, examTasks, examTestCases]);
+  }, []);
 
   useEffect(() => {
     finishExamRef.current = finishExam;
