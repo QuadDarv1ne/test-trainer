@@ -1,4 +1,4 @@
-import { loadAttempts, loadProgress, loadStreak, type AttemptRecord, type TaskProgress } from "@/lib/storage";
+import { loadAttempts, loadProgress, loadStreak, type AttemptRecord } from "@/lib/storage";
 import { loadUnlockedAchievements, achievements } from "@/lib/achievements";
 import { tasks } from "@/lib/tasks";
 

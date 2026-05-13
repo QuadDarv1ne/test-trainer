@@ -28,7 +28,6 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import type { EvaluationResult } from "@/lib/evaluator";
-import { categoryColors, categoryI18nKeys } from "./test-form";
 import {
   DropdownMenu,
   DropdownMenuContent,

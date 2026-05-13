@@ -107,7 +107,7 @@ function validatePassword(
   if (!/[a-zа-яё]/.test(password)) errors.push("Хотя бы одна строчная буква");
   if (!/[0-9]/.test(password)) errors.push("Хотя бы одна цифра");
   if (
-    !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+    !/[!@#$%^&*()_+\-=\]{};':"\\|,.<>/?[]/.test(password)
   )
     errors.push("Хотя бы один спецсимвол");
   return { valid: errors.length === 0, errors };
@@ -1197,7 +1197,7 @@ export const tasks: Task[] = [
   if (phone.length === 0) return { valid: false, reason: "Пустая строка" };
   if (!phone.startsWith("+")) return { valid: false, reason: "Номер должен начинаться с +" };
   const digits = phone.replace(/[\\s\\-()]/g, "");
-  if (!/^\+\\d+$/.test(digits)) return { valid: false, reason: "Разрешены только цифры, пробелы, дефисы и скобки" };
+  if (!/^\\+\\d+$/.test(digits)) return { valid: false, reason: "Разрешены только цифры, пробелы, дефисы и скобки" };
   const digitCount = digits.length - 1;
   if (digitCount < 7) return { valid: false, reason: "Слишком короткий номер (мин. 7 цифр)" };
   if (digitCount > 15) return { valid: false, reason: "Слишком длинный номер (макс. 15 цифр)" };

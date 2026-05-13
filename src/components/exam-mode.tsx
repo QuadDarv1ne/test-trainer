@@ -40,7 +40,7 @@ export function ExamMode() {
   const [examResults, setExamResults] = useState<EvaluationResult[]>([]);
   const [examInputs, setExamInputs] = useState<string[]>([]);
   const [examExpected, setExamExpected] = useState("");
-  const [examCategory, setExamCategory] = useState<string>("Нормальное значение");
+  const [examCategory] = useState<string>("Нормальное значение");
   const [showConfetti, setShowConfetti] = useState(false);
   const finishExamRef = useRef<() => void>(null);
   const examTestCasesRef = useRef(examTestCases);

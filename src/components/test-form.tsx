@@ -85,7 +85,7 @@ export function TestForm({ task, onAdd }: TestFormProps) {
       category: "Нормальное значение",
       comment: "",
     });
-  }, [task.id, form]);
+  }, [task.id, task.params, form]);
 
   const getPlaceholder = (paramType: string) => {
     if (paramType === "string") return t("form_placeholder_string");

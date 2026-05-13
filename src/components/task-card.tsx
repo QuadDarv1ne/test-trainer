@@ -123,7 +123,6 @@ export function TaskCard({ task, isSelected: isSelectedProp, bestScore, onClick 
 
           <div className="flex flex-wrap gap-1">
             {task.topics.map((topic) => {
-              const topicKey = `topic_${topic.toLowerCase().replace(/[^a-zа-яё]/gi, "_").replace(/_+/g, "_").replace(/^_|_$/g, "")}`;
               // Map Russian topic names to i18n keys
               const topicTranslation =
                 topic === "Классы эквивалентности"

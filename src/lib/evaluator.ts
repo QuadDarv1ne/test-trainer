@@ -373,7 +373,7 @@ function findCoveredEquivalenceClasses(
       // validateDate
       const day = Number(inputs[0]);
       const month = Number(inputs[1]);
-      const year = Number(inputs[2]);
+      const _year = Number(inputs[2]);
 
       if (result && typeof result === "object" && "valid" in result) {
         const res = result as { valid: boolean; reason?: string };
@@ -557,7 +557,7 @@ function findCoveredEquivalenceClasses(
       if (result && typeof result === "object" && "valid" in result) {
         const res = result as { valid: boolean; reason?: string };
         const digits = phone.replace(/[\s\-()]/g, "");
-        const digitCount = digits.length - 1;
+        const _digitCount = digits.length - 1;
 
         if (ec.id === "ec1" && res.valid) {
           covered.push(ec.id);
@@ -629,10 +629,10 @@ function compareOutputs(expected: string, actual: unknown): boolean {
   // Handle "Error:" prefix matching better
   if (normalizedExpected.includes("ошибк") || normalizedExpected.includes("исключен") || normalizedExpected.startsWith("error:")) {
     // Strip error prefixes from both expected and actual for comparison
-    let strippedExpected = normalizedExpected
+    const strippedExpected = normalizedExpected
       .replace(/^error:\s*/i, "")
       .replace(/^ошибка:\s*/, "");
-    let strippedActual = normalizedActual
+    const strippedActual = normalizedActual
       .replace(/^error:\s*/i, "")
       .replace(/^ошибка:\s*/, "");
     if (strippedActual.includes(strippedExpected) || strippedExpected.includes(strippedActual)) {
