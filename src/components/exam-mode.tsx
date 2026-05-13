@@ -172,15 +172,14 @@ export function ExamMode() {
   }, [examTasks, currentTaskIndex, examInputs, examExpected, examCategory, t]);
 
   const submitCurrentTask = useCallback(() => {
-    const task = examTasks[currentTaskIndex];
+    const task = examTasksRef.current[currentTaskIndex];
     if (!task) return;
-    const tcs = examTestCases[task.id] || [];
+    const tcs = examTestCasesRef.current[task.id] || [];
     if (tcs.length === 0) {
       toast.error(t("exam_add_at_least_one"));
       return;
     }
     const result = evaluateTestCases(task, tcs);
-    setExamResults((prev) => [...prev, result]);
 
     // Save this task's result to attempt history
     saveAttempt({
@@ -193,20 +192,30 @@ export function ExamMode() {
       testCasesCount: tcs.length,
     });
 
-    if (currentTaskIndex < examTasks.length - 1) {
-      const nextTask = examTasks[currentTaskIndex + 1];
+    // Use functional update to avoid stale closure on examResults
+    setExamResults((prev) => {
+      // Prevent double-submit of the same task
+      if (prev.find((r) => r.task.id === task.id)) return prev;
+      const updated = [...prev, result];
+
+      if (currentTaskIndex < examTasksRef.current.length - 1) {
+        return updated;
+      }
+      // Last task — transition to results
+      setExamState("results");
+      window.dispatchEvent(new Event("achievements-updated"));
+      triggerConfetti(updated);
+      return updated;
+    });
+
+    if (currentTaskIndex < examTasksRef.current.length - 1) {
+      const nextTask = examTasksRef.current[currentTaskIndex + 1];
       setCurrentTaskIndex((i) => i + 1);
       setExamInputs(nextTask.params.map(() => ""));
       setExamExpected("");
       toast.success(t("exam_task_checked").replace("{name}", task.name).replace("{score}", String(result.overallScore)));
-    } else {
-      const allResults = [...examResults, result];
-      setExamResults(allResults);
-      setExamState("results");
-      window.dispatchEvent(new Event("achievements-updated"));
-      triggerConfetti(allResults);
     }
-  }, [examTasks, currentTaskIndex, examTestCases, examResults, t, triggerConfetti]);
+  }, [currentTaskIndex, t, triggerConfetti]);
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60);
@@ -495,9 +504,24 @@ export function ExamMode() {
           )}
         </CardContent>
       </Card>
-      {examResults.map((result) => (
-        <ResultsPanel key={result.task.id} result={result} onReset={() => {}} />
-      ))}
+      {examResults.map((result) => {
+        const handleReset = () => {
+          setExamResults((prev) => prev.filter((r) => r.task.id !== result.task.id));
+          const taskIndex = examTasks.findIndex((t) => t.id === result.task.id);
+          if (taskIndex >= 0) {
+            setCurrentTaskIndex(taskIndex);
+            const task = examTasks[taskIndex];
+            setExamInputs(task.params.map(() => ""));
+            setExamExpected("");
+            setExamTestCases((prev) => ({ ...prev, [task.id]: [] }));
+            setExamState("running");
+            toast.info(t("exam_reset_task").replace("{name}", task.name));
+          }
+        };
+        return (
+          <ResultsPanel key={result.task.id} result={result} onReset={handleReset} />
+        );
+      })}
       <div className="flex justify-center gap-2">
         <Button variant="outline" onClick={() => setExamState("setup")}>
           <RotateCcw className="h-4 w-4 mr-1" />
