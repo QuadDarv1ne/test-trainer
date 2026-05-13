@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useAppStore } from "@/lib/store";
 import { AppHeader } from "@/components/app-header";
@@ -74,21 +73,19 @@ export default function Home() {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabNavigation />
 
-          <AnimatePresence mode="wait">
-            <TasksTab key="tasks" />
-            <TrainerTab key="trainer" />
-            <ResultsTab key="results" />
-            <TheoryTab key="theory" />
-            <TabsContent key="statistics" value="statistics">
-              <StatisticsPanel />
-            </TabsContent>
-            <TabsContent key="achievements" value="achievements">
-              <AchievementsPanel />
-            </TabsContent>
-            <TabsContent key="exam" value="exam">
-              <ExamMode />
-            </TabsContent>
-          </AnimatePresence>
+          <TasksTab key="tasks" />
+          <TrainerTab key="trainer" />
+          <ResultsTab key="results" />
+          <TheoryTab key="theory" />
+          <TabsContent key="statistics" value="statistics">
+            <StatisticsPanel />
+          </TabsContent>
+          <TabsContent key="achievements" value="achievements">
+            <AchievementsPanel />
+          </TabsContent>
+          <TabsContent key="exam" value="exam">
+            <ExamMode />
+          </TabsContent>
         </Tabs>
       </main>
 

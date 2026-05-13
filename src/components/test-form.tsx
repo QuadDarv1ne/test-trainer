@@ -77,7 +77,9 @@ export function TestForm({ task, onAdd }: TestFormProps) {
     },
   });
 
-  // Reset form when task changes
+  // Reset form when task changes.
+  // Intentionally using task.params.length instead of task.params to avoid
+  // unnecessary resets (task.params is a new array reference on every render).
   useEffect(() => {
     form.reset({
       inputs: task.params.map(() => ""),
@@ -85,7 +87,7 @@ export function TestForm({ task, onAdd }: TestFormProps) {
       category: "Нормальное значение",
       comment: "",
     });
-  }, [task.id, task.params, form]);
+  }, [task.id, task.params.length]);
 
   const getPlaceholder = (paramType: string) => {
     if (paramType === "string") return t("form_placeholder_string");

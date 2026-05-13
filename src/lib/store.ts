@@ -2,7 +2,7 @@ import { create } from "zustand";
 import type { Task } from "@/lib/tasks";
 import type { TestCase, EvaluationResult } from "@/lib/evaluator";
 import { evaluateTestCases } from "@/lib/evaluator";
-import { saveCurrentSession, loadCurrentSession, saveProgress as saveProgressToStorage, loadProgress as loadProgressFromStorage, saveAttempt, loadAttempts, getTaskHistory, loadStreak, saveStreak, clearAllProgress, type TaskProgress as StorageTaskProgress, type AttemptRecord, type StreakData } from "@/lib/storage";
+import { saveCurrentSession, loadCurrentSession, saveProgress as saveProgressToStorage, loadProgress as loadProgressFromStorage, saveAttempt, loadAttempts, getTaskHistory, loadStreak, saveStreak, clearAllProgress as clearAllProgressFromStorage, type TaskProgress as StorageTaskProgress, type AttemptRecord, type StreakData } from "@/lib/storage";
 
 export type { TaskProgress as StorageTaskProgress, AttemptRecord, StreakData } from "@/lib/storage";
 
@@ -149,7 +149,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   getTaskHistory: (taskId) => getTaskHistory(taskId),
 
   clearAllProgress: () => {
-    clearAllProgress();
+    clearAllProgressFromStorage();
     set({ savedProgress: {} });
   },
 }));

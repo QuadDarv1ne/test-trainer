@@ -322,9 +322,6 @@ function findCoveredEquivalenceClasses(
         if (ec.id === "t6-ec8" && inputStr === "" && errors.length >= 4) {
           covered.push(ec.id);
         }
-        if (ec.id === "t6-ec9" && error) {
-          covered.push(ec.id);
-        }
       } else if (ec.id === "t6-ec9" && error) {
         covered.push(ec.id);
       }
@@ -579,9 +576,6 @@ function findCoveredEquivalenceClasses(
           covered.push(ec.id);
         }
         if (ec.id === "t13-ec8" && !res.valid && phone === "+") {
-          covered.push(ec.id);
-        }
-        if (ec.id === "t13-ec9" && error) {
           covered.push(ec.id);
         }
       }
