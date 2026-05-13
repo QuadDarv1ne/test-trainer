@@ -168,9 +168,9 @@ function findCoveredEquivalenceClasses(
 
     if (taskId === 1) {
       // Factorial
-      if (ec.id === "ec1" && inputs[0] === 0) covered.push(ec.id);
+      if (ec.id === "t1-ec1" && inputs[0] === 0) covered.push(ec.id);
       if (
-        ec.id === "ec2" &&
+        ec.id === "t1-ec2" &&
         Number.isInteger(inputs[0]) &&
         Number(inputs[0]) >= 1 &&
         Number(inputs[0]) <= 20
@@ -180,16 +180,16 @@ function findCoveredEquivalenceClasses(
 
     if (taskId === 2) {
       // isPrime
-      if (ec.id === "ec1" && Number(inputs[0]) <= 1) covered.push(ec.id);
-      if (ec.id === "ec2" && Number(inputs[0]) === 2) covered.push(ec.id);
+      if (ec.id === "t2-ec1" && Number(inputs[0]) <= 1) covered.push(ec.id);
+      if (ec.id === "t2-ec2" && Number(inputs[0]) === 2) covered.push(ec.id);
       if (
-        ec.id === "ec3" &&
+        ec.id === "t2-ec3" &&
         result === true &&
         Number(inputs[0]) > 2
       )
         covered.push(ec.id);
       if (
-        ec.id === "ec4" &&
+        ec.id === "t2-ec4" &&
         result === false &&
         Number(inputs[0]) > 1
       )
@@ -201,28 +201,28 @@ function findCoveredEquivalenceClasses(
       const price = Number(inputs[0]);
       const discount = Number(inputs[1]);
 
-      if (ec.id === "ec1" && !error && discount === 0 && price > 0) {
+      if (ec.id === "t3-ec1" && !error && discount === 0 && price > 0) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec2" && !error && discount > 0 && discount < 100 && price > 0) {
+      if (ec.id === "t3-ec2" && !error && discount > 0 && discount < 100 && price > 0) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec3" && !error && discount === 100 && price > 0) {
+      if (ec.id === "t3-ec3" && !error && discount === 100 && price > 0) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec4" && !error && price === 0) {
+      if (ec.id === "t3-ec4" && !error && price === 0) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec5" && error && typeof price === "number" && !isNaN(price) && price < 0) {
+      if (ec.id === "t3-ec5" && error && typeof price === "number" && !isNaN(price) && price < 0) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec6" && error && typeof discount === "number" && !isNaN(discount) && discount < 0) {
+      if (ec.id === "t3-ec6" && error && typeof discount === "number" && !isNaN(discount) && discount < 0) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec7" && error && typeof discount === "number" && !isNaN(discount) && discount > 100) {
+      if (ec.id === "t3-ec7" && error && typeof discount === "number" && !isNaN(discount) && discount > 100) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec8" && error && (typeof inputs[0] !== "number" || typeof inputs[1] !== "number")) {
+      if (ec.id === "t3-ec8" && error && (typeof inputs[0] !== "number" || typeof inputs[1] !== "number")) {
         covered.push(ec.id);
       }
     }
@@ -230,24 +230,24 @@ function findCoveredEquivalenceClasses(
     if (taskId === 4) {
       // isLeapYear
       if (
-        ec.id === "ec1" &&
+        ec.id === "t4-ec1" &&
         Number(inputs[0]) % 400 === 0
       )
         covered.push(ec.id);
       if (
-        ec.id === "ec2" &&
+        ec.id === "t4-ec2" &&
         Number(inputs[0]) % 100 === 0 &&
         Number(inputs[0]) % 400 !== 0
       )
         covered.push(ec.id);
       if (
-        ec.id === "ec3" &&
+        ec.id === "t4-ec3" &&
         Number(inputs[0]) % 4 === 0 &&
         Number(inputs[0]) % 100 !== 0
       )
         covered.push(ec.id);
       if (
-        ec.id === "ec4" &&
+        ec.id === "t4-ec4" &&
         Number(inputs[0]) % 4 !== 0
       )
         covered.push(ec.id);
@@ -256,27 +256,27 @@ function findCoveredEquivalenceClasses(
     if (taskId === 5) {
       // triangle
       if (
-        ec.id === "ec1" &&
+        ec.id === "t5-ec1" &&
         result === "равносторонний"
       )
         covered.push(ec.id);
       if (
-        ec.id === "ec2" &&
+        ec.id === "t5-ec2" &&
         result === "равнобедренный"
       )
         covered.push(ec.id);
       if (
-        ec.id === "ec3" &&
+        ec.id === "t5-ec3" &&
         result === "разносторонний"
       )
         covered.push(ec.id);
       if (
-        ec.id === "ec4" &&
+        ec.id === "t5-ec4" &&
         result === "не треугольник"
       )
         covered.push(ec.id);
       if (
-        ec.id === "ec6" &&
+        ec.id === "t5-ec6" &&
         result === "не треугольник" &&
         !error
       ) {
@@ -298,34 +298,34 @@ function findCoveredEquivalenceClasses(
         const errors = res.errors;
         const inputStr = String(inputs[0]);
 
-        if (ec.id === "ec1" && res.valid) {
+        if (ec.id === "t6-ec1" && res.valid) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec2" && errors.includes("Минимум 8 символов") && errors.length === 1) {
+        if (ec.id === "t6-ec2" && errors.includes("Минимум 8 символов") && errors.length === 1) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec3" && errors.some(e => e.includes("заглавну")) && !errors.includes("Минимум 8 символов") && errors.length <= 2) {
+        if (ec.id === "t6-ec3" && errors.some(e => e.includes("заглавну")) && !errors.includes("Минимум 8 символов") && errors.length <= 2) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec4" && errors.some(e => e.includes("строчну")) && !errors.includes("Минимум 8 символов") && errors.length <= 2) {
+        if (ec.id === "t6-ec4" && errors.some(e => e.includes("строчну")) && !errors.includes("Минимум 8 символов") && errors.length <= 2) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec5" && errors.some(e => e.includes("цифр")) && !errors.includes("Минимум 8 символов") && errors.length <= 2) {
+        if (ec.id === "t6-ec5" && errors.some(e => e.includes("цифр")) && !errors.includes("Минимум 8 символов") && errors.length <= 2) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec6" && errors.some(e => e.includes("спецсимвол")) && !errors.includes("Минимум 8 символов") && errors.length <= 2) {
+        if (ec.id === "t6-ec6" && errors.some(e => e.includes("спецсимвол")) && !errors.includes("Минимум 8 символов") && errors.length <= 2) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec7" && errors.length >= 2 && inputStr !== "" && errors.length < 4) {
+        if (ec.id === "t6-ec7" && errors.length >= 2 && inputStr !== "" && errors.length < 4) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec8" && inputStr === "" && errors.length >= 4) {
+        if (ec.id === "t6-ec8" && inputStr === "" && errors.length >= 4) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec9" && error) {
+        if (ec.id === "t6-ec9" && error) {
           covered.push(ec.id);
         }
-      } else if (ec.id === "ec9" && error) {
+      } else if (ec.id === "t6-ec9" && error) {
         covered.push(ec.id);
       }
     }
@@ -337,34 +337,34 @@ function findCoveredEquivalenceClasses(
       const start = Number(inputs[2]);
       const length = Number(inputs[3]);
 
-      if (ec.id === "ec1" && !error && typeof s1 === "string" && typeof s2 === "string" && start >= 0 && start < s1.length && length > 0 && length <= s1.length - start) {
+      if (ec.id === "t7-ec1" && !error && typeof s1 === "string" && typeof s2 === "string" && start >= 0 && start < s1.length && length > 0 && length <= s1.length - start) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec2" && !error && start === 0 && length > 0) {
+      if (ec.id === "t7-ec2" && !error && start === 0 && length > 0) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec3" && !error && typeof s1 === "string" && start >= s1.length) {
+      if (ec.id === "t7-ec3" && !error && typeof s1 === "string" && start >= s1.length) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec4" && !error && length === 0) {
+      if (ec.id === "t7-ec4" && !error && length === 0) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec5" && !error && typeof s1 === "string" && length > s1.length - start) {
+      if (ec.id === "t7-ec5" && !error && typeof s1 === "string" && length > s1.length - start) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec6" && !error && typeof s1 === "string" && s1 === "") {
+      if (ec.id === "t7-ec6" && !error && typeof s1 === "string" && s1 === "") {
         covered.push(ec.id);
       }
-      if (ec.id === "ec7" && !error && typeof s2 === "string" && s2 === "") {
+      if (ec.id === "t7-ec7" && !error && typeof s2 === "string" && s2 === "") {
         covered.push(ec.id);
       }
-      if (ec.id === "ec8" && error && typeof start === "number" && start < 0) {
+      if (ec.id === "t7-ec8" && error && typeof start === "number" && start < 0) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec9" && error && typeof length === "number" && length < 0) {
+      if (ec.id === "t7-ec9" && error && typeof length === "number" && length < 0) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec10" && error && (typeof s1 !== "string" || typeof s2 !== "string")) {
+      if (ec.id === "t7-ec10" && error && (typeof s1 !== "string" || typeof s2 !== "string")) {
         covered.push(ec.id);
       }
     }
@@ -378,60 +378,60 @@ function findCoveredEquivalenceClasses(
       if (result && typeof result === "object" && "valid" in result) {
         const res = result as { valid: boolean; reason?: string };
 
-        if (ec.id === "ec1" && res.valid) {
+        if (ec.id === "t8-ec1" && res.valid) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec2" && res.valid && month === 2 && day === 29) {
+        if (ec.id === "t8-ec2" && res.valid && month === 2 && day === 29) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec3" && !res.valid && res.reason?.includes("не более") && month === 2 && day === 29) {
+        if (ec.id === "t8-ec3" && !res.valid && res.reason?.includes("не более") && month === 2 && day === 29) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec4" && !res.valid && res.reason?.includes("не более") && month === 4 && day === 31) {
+        if (ec.id === "t8-ec4" && !res.valid && res.reason?.includes("не более") && month === 4 && day === 31) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec5" && !res.valid && res.reason?.includes("Месяц")) {
+        if (ec.id === "t8-ec5" && !res.valid && res.reason?.includes("Месяц")) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec6" && !res.valid && res.reason?.includes("День")) {
+        if (ec.id === "t8-ec6" && !res.valid && res.reason?.includes("День")) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec7" && !res.valid && res.reason?.includes("Год")) {
+        if (ec.id === "t8-ec7" && !res.valid && res.reason?.includes("Год")) {
           covered.push(ec.id);
         }
       }
-      if (ec.id === "ec8" && error) {
+      if (ec.id === "t8-ec8" && error) {
         covered.push(ec.id);
       }
     }
 
     if (taskId === 9) {
       // sortAndFilter
-      if (ec.id === "ec1" && !error && Array.isArray(inputs[0]) && (inputs[0] as number[]).every(n => n >= 0)) {
+      if (ec.id === "t9-ec1" && !error && Array.isArray(inputs[0]) && (inputs[0] as number[]).every(n => n >= 0)) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec2" && !error && Array.isArray(inputs[0]) && (inputs[0] as number[]).some(n => n < 0) && (inputs[0] as number[]).some(n => n >= 0)) {
+      if (ec.id === "t9-ec2" && !error && Array.isArray(inputs[0]) && (inputs[0] as number[]).some(n => n < 0) && (inputs[0] as number[]).some(n => n >= 0)) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec3" && !error && Array.isArray(inputs[0]) && (inputs[0] as number[]).length === 0) {
+      if (ec.id === "t9-ec3" && !error && Array.isArray(inputs[0]) && (inputs[0] as number[]).length === 0) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec4" && !error && Array.isArray(inputs[0]) && (inputs[0] as number[]).length === 1) {
+      if (ec.id === "t9-ec4" && !error && Array.isArray(inputs[0]) && (inputs[0] as number[]).length === 1) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec5" && !error && Array.isArray(inputs[0]) && (inputs[0] as number[]).every(n => n < 0)) {
+      if (ec.id === "t9-ec5" && !error && Array.isArray(inputs[0]) && (inputs[0] as number[]).every(n => n < 0)) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec6" && !error && Array.isArray(inputs[0]) && new Set(inputs[0]).size < (inputs[0] as number[]).length) {
+      if (ec.id === "t9-ec6" && !error && Array.isArray(inputs[0]) && new Set(inputs[0]).size < (inputs[0] as number[]).length) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec7" && error && Array.isArray(inputs[0]) && (inputs[0] as number[]).some(v => typeof v === "number" && isNaN(v))) {
+      if (ec.id === "t9-ec7" && error && Array.isArray(inputs[0]) && (inputs[0] as number[]).some(v => typeof v === "number" && isNaN(v))) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec8" && error && !Array.isArray(inputs[0])) {
+      if (ec.id === "t9-ec8" && error && !Array.isArray(inputs[0])) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec9" && error && Array.isArray(inputs[0]) && (inputs[0] as number[]).length > 1000) {
+      if (ec.id === "t9-ec9" && error && Array.isArray(inputs[0]) && (inputs[0] as number[]).length > 1000) {
         covered.push(ec.id);
       }
     }
@@ -442,69 +442,69 @@ function findCoveredEquivalenceClasses(
         const res = result as { valid: boolean; reason?: string };
         const email = String(inputs[0]);
 
-        if (ec.id === "ec1" && res.valid) {
+        if (ec.id === "t10-ec1" && res.valid) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec2" && !res.valid && res.reason?.includes("Пуст")) {
+        if (ec.id === "t10-ec2" && !res.valid && res.reason?.includes("Пуст")) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec3" && !res.valid && res.reason?.includes("длинн")) {
+        if (ec.id === "t10-ec3" && !res.valid && res.reason?.includes("длинн")) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec4" && !res.valid && res.reason?.includes("@")) {
+        if (ec.id === "t10-ec4" && !res.valid && res.reason?.includes("@")) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec5" && !res.valid && res.reason?.includes("локальн")) {
+        if (ec.id === "t10-ec5" && !res.valid && res.reason?.includes("локальн")) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec6" && !res.valid && res.reason?.includes("домен") && !res.reason?.includes("уровн")) {
+        if (ec.id === "t10-ec6" && !res.valid && res.reason?.includes("домен") && !res.reason?.includes("уровн")) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec7" && !res.valid && res.reason?.includes("уровн")) {
+        if (ec.id === "t10-ec7" && !res.valid && res.reason?.includes("уровн")) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec8" && !res.valid && email.includes("@") && email.includes(" ")) {
+        if (ec.id === "t10-ec8" && !res.valid && email.includes("@") && email.includes(" ")) {
           covered.push(ec.id);
         }
       }
-      if (ec.id === "ec9" && error) {
+      if (ec.id === "t10-ec9" && error) {
         covered.push(ec.id);
       }
     }
     if (taskId === 11) {
       // passwordStrength
       const pw = String(inputs[0] ?? "");
-      if (ec.id === "ec1" && !error && pw === "") {
+      if (ec.id === "t11-ec1" && !error && pw === "") {
         covered.push(ec.id);
       }
-      if (ec.id === "ec2" && !error && pw.length >= 1 && pw.length <= 3) {
+      if (ec.id === "t11-ec2" && !error && pw.length >= 1 && pw.length <= 3) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec3" && !error && pw.length >= 4 && pw.length <= 7) {
+      if (ec.id === "t11-ec3" && !error && pw.length >= 4 && pw.length <= 7) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec4" && !error && pw.length >= 8 && pw.length <= 11) {
+      if (ec.id === "t11-ec4" && !error && pw.length >= 8 && pw.length <= 11) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec5" && !error && pw.length >= 12) {
+      if (ec.id === "t11-ec5" && !error && pw.length >= 12) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec6" && !error && typeof result === "number" && result === 100) {
+      if (ec.id === "t11-ec6" && !error && typeof result === "number" && result === 100) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec7" && !error && pw.length >= 4 && /^[a-zа-яё]+$/.test(pw)) {
+      if (ec.id === "t11-ec7" && !error && pw.length >= 4 && /^[a-zа-яё]+$/.test(pw)) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec8" && !error && pw.length >= 4 && /^[A-ZА-ЯЁ]+$/.test(pw)) {
+      if (ec.id === "t11-ec8" && !error && pw.length >= 4 && /^[A-ZА-ЯЁ]+$/.test(pw)) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec9" && !error && pw.length >= 4 && /^[0-9]+$/.test(pw)) {
+      if (ec.id === "t11-ec9" && !error && pw.length >= 4 && /^[0-9]+$/.test(pw)) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec10" && error) {
+      if (ec.id === "t11-ec10" && error) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec11" && error && typeof inputs[0] === "string" && (inputs[0] as string).length > 128) {
+      if (ec.id === "t11-ec11" && error && typeof inputs[0] === "string" && (inputs[0] as string).length > 128) {
         covered.push(ec.id);
       }
     }
@@ -513,40 +513,40 @@ function findCoveredEquivalenceClasses(
       // calculateShipping
       const weight = Number(inputs[0]);
       const distance = Number(inputs[1]);
-      if (ec.id === "ec1" && !error && weight > 0 && weight <= 1) {
+      if (ec.id === "t12-ec1" && !error && weight > 0 && weight <= 1) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec2" && !error && weight > 1 && weight <= 5) {
+      if (ec.id === "t12-ec2" && !error && weight > 1 && weight <= 5) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec3" && !error && weight > 5 && weight <= 20) {
+      if (ec.id === "t12-ec3" && !error && weight > 5 && weight <= 20) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec4" && !error && weight > 20) {
+      if (ec.id === "t12-ec4" && !error && weight > 20) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec5" && !error && distance > 0 && distance <= 10) {
+      if (ec.id === "t12-ec5" && !error && distance > 0 && distance <= 10) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec6" && !error && distance > 10 && distance <= 50) {
+      if (ec.id === "t12-ec6" && !error && distance > 10 && distance <= 50) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec7" && !error && distance > 50) {
+      if (ec.id === "t12-ec7" && !error && distance > 50) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec8" && error && typeof weight === "number" && weight <= 0) {
+      if (ec.id === "t12-ec8" && error && typeof weight === "number" && weight <= 0) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec9" && error && typeof distance === "number" && distance <= 0) {
+      if (ec.id === "t12-ec9" && error && typeof distance === "number" && distance <= 0) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec10" && error && typeof weight === "number" && weight > 100) {
+      if (ec.id === "t12-ec10" && error && typeof weight === "number" && weight > 100) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec11" && error && typeof distance === "number" && distance > 5000) {
+      if (ec.id === "t12-ec11" && error && typeof distance === "number" && distance > 5000) {
         covered.push(ec.id);
       }
-      if (ec.id === "ec12" && error && (typeof inputs[0] !== "number" || typeof inputs[1] !== "number")) {
+      if (ec.id === "t12-ec12" && error && (typeof inputs[0] !== "number" || typeof inputs[1] !== "number")) {
         covered.push(ec.id);
       }
     }
@@ -557,35 +557,35 @@ function findCoveredEquivalenceClasses(
       if (result && typeof result === "object" && "valid" in result) {
         const res = result as { valid: boolean; reason?: string };
 
-        if (ec.id === "ec1" && res.valid) {
+        if (ec.id === "t13-ec1" && res.valid) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec2" && !res.valid && res.reason?.includes("Пуст")) {
+        if (ec.id === "t13-ec2" && !res.valid && res.reason?.includes("Пуст")) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec3" && !res.valid && !phone.startsWith("+")) {
+        if (ec.id === "t13-ec3" && !res.valid && !phone.startsWith("+")) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec4" && !res.valid && res.reason?.includes("коротк")) {
+        if (ec.id === "t13-ec4" && !res.valid && res.reason?.includes("коротк")) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec5" && !res.valid && res.reason?.includes("длинн")) {
+        if (ec.id === "t13-ec5" && !res.valid && res.reason?.includes("длинн")) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec6" && res.valid && (phone.includes("-") || phone.includes(" ") || phone.includes("("))) {
+        if (ec.id === "t13-ec6" && res.valid && (phone.includes("-") || phone.includes(" ") || phone.includes("("))) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec7" && !res.valid && res.reason?.includes("Разрешены")) {
+        if (ec.id === "t13-ec7" && !res.valid && res.reason?.includes("Разрешены")) {
           covered.push(ec.id);
         }
-        if (ec.id === "ec8" && !res.valid && phone === "+") {
+        if (ec.id === "t13-ec8" && !res.valid && phone === "+") {
           covered.push(ec.id);
         }
-        if (ec.id === "ec9" && error) {
+        if (ec.id === "t13-ec9" && error) {
           covered.push(ec.id);
         }
       }
-      if (ec.id === "ec9" && error) {
+      if (ec.id === "t13-ec9" && error) {
         covered.push(ec.id);
       }
     }
