@@ -240,6 +240,10 @@ export const referenceFunctions: Record<
   11: (args: unknown[]) => passwordStrength(args[0] as string),
   12: (args: unknown[]) => calculateShipping(args[0] as number, args[1] as number),
   13: (args: unknown[]) => validatePhone(args[0] as string),
+  14: (args: unknown[]) => calculateGrade(args[0] as number),
+  15: (args: unknown[]) => queueOperation(args[0] as string[], args[1] as string, args[2] as string | undefined),
+  16: (args: unknown[]) => binarySearch(args[0] as number[], args[1] as number),
+  17: (args: unknown[]) => analyzeText(args[0] as string),
 };
 
 export const tasks: Task[] = [
@@ -1224,10 +1228,509 @@ export const tasks: Task[] = [
       { value: "+7 (999) 123-45-67", description: "С разделителями" },
     ],
   },
+  {
+    id: 14,
+    name: "Расчёт оценки",
+    difficulty: "Легко",
+    description:
+      "Преобразует **числовой балл** (0–100) в **буквенную оценку** и **GPA**:\n\n- 90–100: A (4.0)\n- 80–89: B (3.0)\n- 70–79: C (2.0)\n- 60–69: D (1.0)\n- 0–59: F (0.0)",
+    signature: "calculateGrade(score: number): { grade: string; gpa: number }",
+    topics: ["Классы эквивалентности", "Граничные значения", "Таблицы решений"],
+    params: [
+      { name: "score", type: "number", description: "Числовой балл (0–100)" },
+    ],
+    returnType: "{ grade: string; gpa: number }",
+    code: `function calculateGrade(score: number): { grade: string; gpa: number } {
+  if (typeof score !== "number" || isNaN(score))
+    throw new Error("Балл должен быть числом");
+  if (score < 0) throw new Error("Балл не может быть отрицательным");
+  if (score > 100) throw new Error("Балл не может превышать 100");
+  if (score >= 90) return { grade: "A", gpa: 4.0 };
+  if (score >= 80) return { grade: "B", gpa: 3.0 };
+  if (score >= 70) return { grade: "C", gpa: 2.0 };
+  if (score >= 60) return { grade: "D", gpa: 1.0 };
+  return { grade: "F", gpa: 0.0 };
+}`,
+    equivalenceClasses: [
+      {
+        id: "t14-ec1",
+        name: "EC1: Отлично (90-100)",
+        description: "Высшая оценка A",
+        exampleValues: [90, 95, 100],
+      },
+      {
+        id: "t14-ec2",
+        name: "EC2: Хорошо (80-89)",
+        description: "Оценка B",
+        exampleValues: [80, 85, 89],
+      },
+      {
+        id: "t14-ec3",
+        name: "EC3: Удовлетворительно (70-79)",
+        description: "Оценка C",
+        exampleValues: [70, 75, 79],
+      },
+      {
+        id: "t14-ec4",
+        name: "EC4: Минимальный проходной (60-69)",
+        description: "Оценка D",
+        exampleValues: [60, 65, 69],
+      },
+      {
+        id: "t14-ec5",
+        name: "EC5: Неудовлетворительно (0-59)",
+        description: "Оценка F",
+        exampleValues: [0, 30, 59],
+      },
+      {
+        id: "t14-ec6",
+        name: "EC6: score < 0",
+        description: "Недопустимый балл",
+        exampleValues: [-1, -50],
+      },
+      {
+        id: "t14-ec7",
+        name: "EC7: score > 100",
+        description: "Превышение максимума",
+        exampleValues: [101, 150],
+      },
+      {
+        id: "t14-ec8",
+        name: "EC8: Нечисловой аргумент",
+        description: "Неверный тип",
+        exampleValues: ["85", null, undefined],
+      },
+    ],
+    boundaryValues: [
+      { value: 0, description: "Минимальный балл (F)" },
+      { value: 59, description: "Максимум F" },
+      { value: 60, description: "Минимум D (граница)" },
+      { value: 69, description: "Максимум D" },
+      { value: 70, description: "Минимум C (граница)" },
+      { value: 79, description: "Максимум C" },
+      { value: 80, description: "Минимум B (граница)" },
+      { value: 89, description: "Максимум B" },
+      { value: 90, description: "Минимум A (граница)" },
+      { value: 100, description: "Максимальный балл" },
+    ],
+  },
+  {
+    id: 15,
+    name: "Очередь (Queue)",
+    difficulty: "Сложно",
+    description:
+      "Реализует операции **очереди** (FIFO):\n\n- `enqueue` — добавить элемент в конец\n- `dequeue` — удалить элемент из начала\n- `peek` — посмотреть первый элемент\n- `isEmpty` — проверка на пустоту\n- `size` — размер очереди\n\nМаксимальный размер очереди: 100 элементов.",
+    signature: "queueOperation(queue: string[], operation: string, item?: string): { queue: string[]; result?: string }",
+    topics: ["Классы эквивалентности", "Тестирование состояний", "Проверка коллекций"],
+    params: [
+      { name: "queue", type: "string[]", description: "Текущее состояние очереди" },
+      { name: "operation", type: "string", description: "Операция: enqueue, dequeue, peek, isEmpty, size" },
+      { name: "item", type: "string (опционально)", description: "Элемент для enqueue" },
+    ],
+    returnType: "{ queue: string[]; result?: string }",
+    code: `function queueOperation(
+  queue: string[],
+  operation: string,
+  item?: string
+): { queue: string[]; result?: string } {
+  if (!Array.isArray(queue)) throw new Error("Очередь должна быть массивом");
+  if (typeof operation !== "string") throw new Error("Операция должна быть строкой");
+  if (queue.length > 100) throw new Error("Очередь слишком большая (макс. 100 элементов)");
+  const q = [...queue];
+  switch (operation) {
+    case "enqueue":
+      if (!item) throw new Error("Для enqueue нужен элемент");
+      if (q.length >= 100) throw new Error("Очередь заполнена");
+      q.push(item);
+      return { queue: q };
+    case "dequeue":
+      if (q.length === 0) throw new Error("Очередь пуста");
+      const dequeued = q.shift();
+      return { queue: q, result: dequeued };
+    case "peek":
+      if (q.length === 0) throw new Error("Очередь пуста");
+      return { queue: q, result: q[0] };
+    case "isEmpty":
+      return { queue: q, result: String(q.length === 0) };
+    case "size":
+      return { queue: q, result: String(q.length) };
+    default:
+      throw new Error(\`Неизвестная операция: \${operation}\`);
+  }
+}`,
+    equivalenceClasses: [
+      {
+        id: "t15-ec1",
+        name: "EC1: Enqueue в непустую очередь",
+        description: "Добавление элемента",
+        exampleValues: [[["a", "b"], "enqueue", "c"]],
+      },
+      {
+        id: "t15-ec2",
+        name: "EC2: Enqueue в пустую очередь",
+        description: "Первый элемент",
+        exampleValues: [[[], "enqueue", "first"]],
+      },
+      {
+        id: "t15-ec3",
+        name: "EC3: Dequeue из непустой",
+        description: "Извлечение элемента",
+        exampleValues: [[["a", "b"], "dequeue"]],
+      },
+      {
+        id: "t15-ec4",
+        name: "EC4: Dequeue из пустой",
+        description: "Ошибка — очередь пуста",
+        exampleValues: [[[], "dequeue"]],
+      },
+      {
+        id: "t15-ec5",
+        name: "EC5: Peek из непустой",
+        description: "Просмотр первого элемента",
+        exampleValues: [[["a", "b"], "peek"]],
+      },
+      {
+        id: "t15-ec6",
+        name: "EC6: Peek из пустой",
+        description: "Ошибка — очередь пуста",
+        exampleValues: [[[], "peek"]],
+      },
+      {
+        id: "t15-ec7",
+        name: "EC7: isEmpty",
+        description: "Проверка на пустоту",
+        exampleValues: [[["a"], "isEmpty"], [[], "isEmpty"]],
+      },
+      {
+        id: "t15-ec8",
+        name: "EC8: size",
+        description: "Получение размера",
+        exampleValues: [[["a", "b", "c"], "size"]],
+      },
+      {
+        id: "t15-ec9",
+        name: "EC9: Неизвестная операция",
+        description: "Ошибка — операция не распознана",
+        exampleValues: [[["a"], "unknown"]],
+      },
+      {
+        id: "t15-ec10",
+        name: "EC10: Enqueue без элемента",
+        description: "Ошибка — отсутствует элемент",
+        exampleValues: [[["a"], "enqueue"]],
+      },
+      {
+        id: "t15-ec11",
+        name: "EC11: Переполнение очереди",
+        description: "Очередь достигла 100 элементов",
+        exampleValues: [Array(100).fill("x"), "enqueue", "overflow"],
+      },
+    ],
+    boundaryValues: [
+      { value: [[], "enqueue", "first"], description: "Первый элемент в пустую" },
+      { value: [["a"], "dequeue"], description: "Последний элемент" },
+      { value: [[], "dequeue"], description: "Dequeue из пустой — ошибка" },
+      { value: [Array(99).fill("x"), "enqueue", "last"], description: "Предпоследний" },
+      { value: [Array(100).fill("x"), "enqueue", "overflow"], description: "Переполнение" },
+    ],
+  },
+  {
+    id: 16,
+    name: "Бинарный поиск",
+    difficulty: "Средне",
+    description:
+      "Выполняет **бинарный поиск** элемента в отсортированном массиве. Возвращает индекс элемента или `-1`, если элемент не найден.\n\n**Важно:** массив должен быть отсортирован по возрастанию!",
+    signature: "binarySearch(arr: number[], target: number): number",
+    topics: ["Классы эквивалентности", "Граничные значения", "Проверка коллекций"],
+    params: [
+      { name: "arr", type: "number[]", description: "Отсортированный массив чисел" },
+      { name: "target", type: "number", description: "Искомый элемент" },
+    ],
+    returnType: "number",
+    code: `function binarySearch(arr: number[], target: number): number {
+  if (!Array.isArray(arr)) throw new Error("Аргумент должен быть массивом");
+  if (typeof target !== "number" || isNaN(target))
+    throw new Error("Цель должна быть числом");
+  for (const item of arr) {
+    if (typeof item !== "number" || isNaN(item))
+      throw new Error("Все элементы должны быть числами");
+  }
+  // Проверка сортировки
+  for (let i = 1; i < arr.length; i++) {
+    if (arr[i] < arr[i - 1]) throw new Error("Массив должен быть отсортирован");
+  }
+  if (arr.length === 0) return -1;
+  if (arr.length > 10000) throw new Error("Массив слишком большой (макс. 10000 элементов)");
+  let left = 0;
+  let right = arr.length - 1;
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    if (arr[mid] === target) return mid;
+    if (arr[mid] < target) left = mid + 1;
+    else right = mid - 1;
+  }
+  return -1;
+}`,
+    equivalenceClasses: [
+      {
+        id: "t16-ec1",
+        name: "EC1: Элемент найден",
+        description: "Target присутствует в массиве",
+        exampleValues: [[[1, 3, 5, 7, 9], 5], [[2, 4, 6, 8], 8]],
+      },
+      {
+        id: "t16-ec2",
+        name: "EC2: Элемент не найден",
+        description: "Target отсутствует в массиве",
+        exampleValues: [[[1, 3, 5, 7], 4], [[10, 20, 30], 25]],
+      },
+      {
+        id: "t16-ec3",
+        name: "EC3: Пустой массив",
+        description: "Возвращает -1",
+        exampleValues: [[[], 5]],
+      },
+      {
+        id: "t16-ec4",
+        name: "EC4: Один элемент — найден",
+        description: "Массив из 1 элемента, совпадает",
+        exampleValues: [[[42], 42]],
+      },
+      {
+        id: "t16-ec5",
+        name: "EC5: Один элемент — не найден",
+        description: "Массив из 1 элемента, не совпадает",
+        exampleValues: [[[42], 10]],
+      },
+      {
+        id: "t16-ec6",
+        name: "EC6: Массив не отсортирован",
+        description: "Ошибка — нарушение порядка",
+        exampleValues: [[[5, 3, 7], 3], [[10, 2, 8], 2]],
+      },
+      {
+        id: "t16-ec7",
+        name: "EC7: Target меньше min",
+        description: "Цель ниже всех элементов",
+        exampleValues: [[[5, 10, 15], 2]],
+      },
+      {
+        id: "t16-ec8",
+        name: "EC8: Target больше max",
+        description: "Цель выше всех элементов",
+        exampleValues: [[[5, 10, 15], 20]],
+      },
+      {
+        id: "t16-ec9",
+        name: "EC9: Дубликаты в массиве",
+        description: "Массив с повторяющимися элементами",
+        exampleValues: [[[2, 2, 2, 5, 5], 2]],
+      },
+    ],
+    boundaryValues: [
+      { value: [[1, 2, 3], 1], description: "Первый элемент" },
+      { value: [[1, 2, 3], 3], description: "Последний элемент" },
+      { value: [[1, 2, 3], 2], description: "Средний элемент" },
+      { value: [[], 1], description: "Пустой массив" },
+      { value: [[5], 5], description: "Один элемент — найден" },
+      { value: [[5], 3], description: "Один элемент — не найден" },
+      { value: [[1, 3, 5, 7, 9], 0], description: "Ниже минимума" },
+      { value: [[1, 3, 5, 7, 9], 10], description: "Выше максимума" },
+    ],
+  },
+  {
+    id: 17,
+    name: "Анализ текста",
+    difficulty: "Средне",
+    description:
+      "Анализирует **текстовую строку** и возвращает статистику:\n\n- Количество слов\n- Количество предложений\n- Средняя длина слова\n\nРазделители слов: пробелы. Разделители предложений: `.`, `!`, `?`.",
+    signature: "analyzeText(text: string): { words: number; sentences: number; avgWordLength: number }",
+    topics: ["Классы эквивалентности", "Проверка форматов", "Обработка строк"],
+    params: [
+      { name: "text", type: "string", description: "Текст для анализа (макс. 10000 символов)" },
+    ],
+    returnType: "{ words: number; sentences: number; avgWordLength: number }",
+    code: `function analyzeText(text: string): {
+  words: number;
+  sentences: number;
+  avgWordLength: number;
+} {
+  if (typeof text !== "string") throw new Error("Текст должен быть строкой");
+  if (text.length === 0) return { words: 0, sentences: 0, avgWordLength: 0 };
+  if (text.length > 10000) throw new Error("Текст слишком длинный (макс. 10000 символов)");
+  const trimmed = text.trim();
+  if (trimmed.length === 0) return { words: 0, sentences: 0, avgWordLength: 0 };
+  const words = trimmed.split(/\\s+/).filter((w) => w.length > 0);
+  const sentences = trimmed.split(/[.!?]+/).filter((s) => s.trim().length > 0);
+  const totalWordLength = words.reduce((sum, w) => sum + w.length, 0);
+  const avgWordLength = words.length > 0 ? Math.round((totalWordLength / words.length) * 100) / 100 : 0;
+  return {
+    words: words.length,
+    sentences: sentences.length,
+    avgWordLength,
+  };
+}`,
+    equivalenceClasses: [
+      {
+        id: "t17-ec1",
+        name: "EC1: Обычный текст",
+        description: "Несколько предложений с словами",
+        exampleValues: ["Hello world. This is a test!"],
+      },
+      {
+        id: "t17-ec2",
+        name: "EC2: Пустая строка",
+        description: "Нулевой результат",
+        exampleValues: [""],
+      },
+      {
+        id: "t17-ec3",
+        name: "EC3: Строка из пробелов",
+        description: "Только whitespace",
+        exampleValues: ["   ", "\t\n"],
+      },
+      {
+        id: "t17-ec4",
+        name: "EC4: Одно слово",
+        description: "Без предложений",
+        exampleValues: ["Hello"],
+      },
+      {
+        id: "t17-ec5",
+        name: "EC5: Одно предложение",
+        description: "Завершается точкой",
+        exampleValues: ["Hello world."],
+      },
+      {
+        id: "t17-ec6",
+        name: "EC6: Множество предложений",
+        description: "Разные разделители",
+        exampleValues: ["Hi! How are you? I'm fine."],
+      },
+      {
+        id: "t17-ec7",
+        name: "EC7: Текст без знаков препинания",
+        description: "Только слова",
+        exampleValues: ["hello world foo bar"],
+      },
+      {
+        id: "t17-ec8",
+        name: "EC8: Текст с лишними пробелами",
+        description: "Множественные пробелы между словами",
+        exampleValues: ["Hello   world.  Test."],
+      },
+      {
+        id: "t17-ec9",
+        name: "EC9: Превышение длины",
+        description: "Текст > 10000 символов",
+        exampleValues: ["a".repeat(10001)],
+      },
+      {
+        id: "t17-ec10",
+        name: "EC10: Не строковый тип",
+        description: "Неверный тип",
+        exampleValues: [123, null, undefined],
+      },
+    ],
+    boundaryValues: [
+      { value: "", description: "Пустая строка" },
+      { value: "a", description: "Один символ" },
+      { value: "Hello", description: "Одно слово" },
+      { value: "Hello.", description: "Одно слово с точкой" },
+      { value: "A B C.", description: "Короткие слова" },
+      { value: "One. Two! Three?", description: "Три предложения" },
+      { value: "  Hello  World.  ", description: "С пробелами по краям" },
+    ],
+  },
 ];
 
-export function getTaskById(id: number): Task | undefined {
-  return tasks.find((t) => t.id === id);
+function calculateGrade(score: number): { grade: string; gpa: number } {
+  if (typeof score !== "number" || isNaN(score))
+    throw new Error("Балл должен быть числом");
+  if (score < 0) throw new Error("Балл не может быть отрицательным");
+  if (score > 100) throw new Error("Балл не может превышать 100");
+  if (score >= 90) return { grade: "A", gpa: 4.0 };
+  if (score >= 80) return { grade: "B", gpa: 3.0 };
+  if (score >= 70) return { grade: "C", gpa: 2.0 };
+  if (score >= 60) return { grade: "D", gpa: 1.0 };
+  return { grade: "F", gpa: 0.0 };
+}
+
+function queueOperation(
+  queue: string[],
+  operation: string,
+  item?: string
+): { queue: string[]; result?: string } {
+  if (!Array.isArray(queue)) throw new Error("Очередь должна быть массивом");
+  if (typeof operation !== "string") throw new Error("Операция должна быть строкой");
+  if (queue.length > 100) throw new Error("Очередь слишком большая (макс. 100 элементов)");
+  const q = [...queue];
+  switch (operation) {
+    case "enqueue":
+      if (!item) throw new Error("Для enqueue нужен элемент");
+      if (q.length >= 100) throw new Error("Очередь заполнена");
+      q.push(item);
+      return { queue: q };
+    case "dequeue":
+      if (q.length === 0) throw new Error("Очередь пуста");
+      const dequeued = q.shift();
+      return { queue: q, result: dequeued };
+    case "peek":
+      if (q.length === 0) throw new Error("Очередь пуста");
+      return { queue: q, result: q[0] };
+    case "isEmpty":
+      return { queue: q, result: String(q.length === 0) };
+    case "size":
+      return { queue: q, result: String(q.length) };
+    default:
+      throw new Error(`Неизвестная операция: ${operation}`);
+  }
+}
+
+function binarySearch(arr: number[], target: number): number {
+  if (!Array.isArray(arr)) throw new Error("Аргумент должен быть массивом");
+  if (typeof target !== "number" || isNaN(target))
+    throw new Error("Цель должна быть числом");
+  for (const item of arr) {
+    if (typeof item !== "number" || isNaN(item))
+      throw new Error("Все элементы должны быть числами");
+  }
+  // Проверка сортировки
+  for (let i = 1; i < arr.length; i++) {
+    if (arr[i] < arr[i - 1]) throw new Error("Массив должен быть отсортирован");
+  }
+  if (arr.length === 0) return -1;
+  if (arr.length > 10000) throw new Error("Массив слишком большой (макс. 10000 элементов)");
+  let left = 0;
+  let right = arr.length - 1;
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    if (arr[mid] === target) return mid;
+    if (arr[mid] < target) left = mid + 1;
+    else right = mid - 1;
+  }
+  return -1;
+}
+
+function analyzeText(text: string): {
+  words: number;
+  sentences: number;
+  avgWordLength: number;
+} {
+  if (typeof text !== "string") throw new Error("Текст должен быть строкой");
+  if (text.length === 0) return { words: 0, sentences: 0, avgWordLength: 0 };
+  if (text.length > 10000) throw new Error("Текст слишком длинный (макс. 10000 символов)");
+  const trimmed = text.trim();
+  if (trimmed.length === 0) return { words: 0, sentences: 0, avgWordLength: 0 };
+  const words = trimmed.split(/\s+/).filter((w) => w.length > 0);
+  const sentences = trimmed.split(/[.!?]+/).filter((s) => s.trim().length > 0);
+  const totalWordLength = words.reduce((sum, w) => sum + w.length, 0);
+  const avgWordLength = words.length > 0 ? Math.round((totalWordLength / words.length) * 100) / 100 : 0;
+  return {
+    words: words.length,
+    sentences: sentences.length,
+    avgWordLength,
+  };
 }
 
 export function runReferenceFunction(

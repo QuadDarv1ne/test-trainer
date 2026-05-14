@@ -52,6 +52,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     topic_combinatorial: "Комбинаторное тестирование",
     topic_formats: "Проверка форматов",
     topic_decision_tables: "Таблицы решений",
+    topic_state_transition: "Тестирование состояний",
+    topic_string_processing: "Обработка строк",
 
     // Trainer
     trainer_back: "Назад",
@@ -405,6 +407,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     topic_combinatorial: "Combinatorial Testing",
     topic_formats: "Format Validation",
     topic_decision_tables: "Decision Tables",
+    topic_state_transition: "State Transition Testing",
+    topic_string_processing: "String Processing",
 
     // Trainer
     trainer_back: "Back",
