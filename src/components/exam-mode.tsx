@@ -41,7 +41,7 @@ export function ExamMode() {
   const [examResults, setExamResults] = useState<EvaluationResult[]>([]);
   const [examInputs, setExamInputs] = useState<string[]>([]);
   const [examExpected, setExamExpected] = useState("");
-  const [examCategory] = useState<string>("Нормальное значение");
+  const examCategory = "Нормальное значение" as TestCase["category"];
   const [showConfetti, setShowConfetti] = useState(false);
   const finishExamRef = useRef<() => void>(null);
   const examTestCasesRef = useRef(examTestCases);
@@ -203,7 +203,7 @@ export function ExamMode() {
     if (isLastTask) {
       setExamState("results");
       window.dispatchEvent(new Event("achievements-updated"));
-      triggerConfetti([...examResults, result]);
+      triggerConfetti([...examResultsRef.current, result]);
     }
 
     if (currentTaskIndex < examTasksRef.current.length - 1) {
@@ -413,10 +413,10 @@ export function ExamMode() {
                 <Input
                   placeholder={
                     param.type === "string"
-                      ? 'Например: "Abc123!@"'
+                      ? t("form_placeholder_string")
                       : param.type === "boolean"
-                      ? "true / false"
-                      : "Например: 5, 0, -1"
+                      ? t("form_placeholder_boolean")
+                      : t("form_placeholder_number")
                   }
                   value={examInputs[idx] ?? ""}
                   onChange={(e) => {
@@ -436,12 +436,12 @@ export function ExamMode() {
               <Input
                 placeholder={
                   task.returnType === "boolean"
-                    ? "true / false"
+                    ? t("form_placeholder_boolean")
                     : task.returnType === "string"
-                    ? 'Например: "равносторонний"'
+                    ? t("form_placeholder_return_string")
                     : task.returnType.startsWith("{")
-                    ? '{ valid: true, errors: [] }'
-                    : "Например: 120"
+                    ? t("form_placeholder_return_object")
+                    : t("form_placeholder_return_number")
                 }
                 value={examExpected}
                 onChange={(e) => setExamExpected(e.target.value)}
