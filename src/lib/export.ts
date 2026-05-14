@@ -79,6 +79,15 @@ export function generateExportCSV(): string {
   const BOM = "\uFEFF";
   const lines: string[] = [];
 
+  // Escape a value for safe CSV output — wraps in quotes if it contains commas, quotes, or newlines
+  const escape = (v: string) => {
+    const s = String(v);
+    if (s.includes(",") || s.includes('"') || s.includes("\n")) {
+      return `"${s.replace(/"/g, '""')}"`;
+    }
+    return s;
+  };
+
   // Summary section
   const totalAttempts = attempts.length;
   const avgScore = totalAttempts > 0
@@ -98,7 +107,7 @@ export function generateExportCSV(): string {
   lines.push("Section,Task,Best Score,Test Cases");
   for (const [taskIdStr, p] of Object.entries(progress)) {
     const taskName = getTaskName(Number(taskIdStr));
-    lines.push(`Progress,${taskName},${p.score}%,${p.testCases.length}`);
+    lines.push(`Progress,${escape(taskName)},${p.score}%,${p.testCases.length}`);
   }
   lines.push("");
 
@@ -108,7 +117,7 @@ export function generateExportCSV(): string {
     for (const a of attempts) {
       const taskName = getTaskName(a.taskId);
       const date = new Date(a.timestamp).toISOString();
-      lines.push(`Attempt,${taskName},${a.score}%,${a.ecCoverage}%,${a.bvCoverage}%,${a.correctnessScore}%,${date},${a.testCasesCount}`);
+      lines.push(`Attempt,${escape(taskName)},${a.score}%,${a.ecCoverage}%,${a.bvCoverage}%,${a.correctnessScore}%,${date},${a.testCasesCount}`);
     }
     lines.push("");
   }
@@ -116,7 +125,7 @@ export function generateExportCSV(): string {
   // Achievements
   lines.push("Section,Achievement ID,Status");
   for (const a of achievements) {
-    lines.push(`Achievement,${a.id},${unlockedAchievements.includes(a.id) ? "Unlocked" : "Locked"}`);
+    lines.push(`Achievement,${escape(a.id)},${unlockedAchievements.includes(a.id) ? "Unlocked" : "Locked"}`);
   }
 
   return BOM + lines.join("\n");

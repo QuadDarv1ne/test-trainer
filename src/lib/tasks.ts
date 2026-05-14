@@ -1339,7 +1339,7 @@ export const tasks: Task[] = [
   const q = [...queue];
   switch (operation) {
     case "enqueue":
-      if (!item) throw new Error("Для enqueue нужен элемент");
+      if (item === undefined) throw new Error("Для enqueue нужен элемент");
       if (q.length >= 100) throw new Error("Очередь заполнена");
       q.push(item);
       return { queue: q };
@@ -1667,7 +1667,7 @@ function queueOperation(
   const q = [...queue];
   switch (operation) {
     case "enqueue":
-      if (!item) throw new Error("Для enqueue нужен элемент");
+      if (item === undefined) throw new Error("Для enqueue нужен элемент");
       if (q.length >= 100) throw new Error("Очередь заполнена");
       q.push(item);
       return { queue: q };

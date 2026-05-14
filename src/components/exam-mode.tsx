@@ -109,18 +109,20 @@ export function ExamMode() {
     finishExamRef.current = finishExam;
   }, [finishExam]);
 
-  // Stable countdown interval — does not recreate on every tick
+  // Stable countdown interval — stops at zero to avoid negative timer
   useEffect(() => {
     if (examState !== "running") return;
     const interval = setInterval(() => {
-      setTimeRemaining((t) => t - 1);
+      setTimeRemaining((t) => (t <= 0 ? 0 : t - 1));
     }, 1000);
     return () => clearInterval(interval);
   }, [examState]);
 
-  // Trigger finish when timer reaches zero
+  // Trigger finish when timer reaches zero — guard against repeated calls
+  const examFinishedRef = useRef(false);
   useEffect(() => {
-    if (examState === "running" && timeRemaining <= 0) {
+    if (examState === "running" && timeRemaining <= 0 && !examFinishedRef.current) {
+      examFinishedRef.current = true;
       finishExamRef.current?.();
     }
   }, [examState, timeRemaining]);
@@ -148,6 +150,7 @@ export function ExamMode() {
     setExamInputs(shuffled.length > 0 ? shuffled[0].params.map(() => "") : []);
     setExamExpected("");
     setTimeRemaining(timeLimit * 60);
+    examFinishedRef.current = false;
     setExamState("running");
   };
 
