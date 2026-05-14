@@ -39,8 +39,9 @@ export function saveProgress(
     const progress = loadProgress();
     const existing = progress[taskId];
 
-    // Сохраняем только если результат лучше
-    if (!existing || score > existing.score) {
+    // Сохраняем, если результат не хуже предыдущего (>=)
+    // чтобы обновить тест-кейсы даже при равном скоре
+    if (!existing || score >= existing.score) {
       progress[taskId] = { score, testCases };
       localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
     }
