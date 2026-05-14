@@ -53,13 +53,15 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   selectedTask: null,
   setSelectedTask: (task) => {
-    set({ selectedTask: task, testCases: [], evaluationResult: null });
+    const state = get();
+    // If re-selecting the same task, do nothing — preserve current test cases
+    if (state.selectedTask && task && state.selectedTask.id === task.id) return;
+    // Load saved session for the new task
     if (task) {
-      // Load saved session for this task
       const saved = loadCurrentSession(task.id);
-      if (saved && saved.length > 0) {
-        set({ testCases: saved });
-      }
+      set({ selectedTask: task, testCases: saved ?? [], evaluationResult: null });
+    } else {
+      set({ selectedTask: null, testCases: [], evaluationResult: null });
     }
   },
 
