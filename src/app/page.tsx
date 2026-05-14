@@ -13,6 +13,7 @@ import { TheoryTab } from "@/components/theory-tab";
 import { StatisticsPanel } from "@/components/statistics-panel";
 import { AchievementsPanel } from "@/components/achievements-panel";
 import { ExamMode } from "@/components/exam-mode";
+import { Onboarding } from "@/components/onboarding";
 import { AppFooter } from "@/components/app-footer";
 
 export default function Home() {
@@ -90,6 +91,7 @@ export default function Home() {
       </main>
 
       <AppFooter />
+      <Onboarding />
     </div>
   );
 }
