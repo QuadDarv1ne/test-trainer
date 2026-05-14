@@ -3,6 +3,9 @@ import type { Task } from "@/lib/tasks";
 import type { TestCase, EvaluationResult } from "@/lib/evaluator";
 import { evaluateTestCases } from "@/lib/evaluator";
 import { saveCurrentSession, loadCurrentSession, saveProgress as saveProgressToStorage, loadProgress as loadProgressFromStorage, saveAttempt, loadAttempts, getTaskHistory, loadStreak, saveStreak, clearAllProgress as clearAllProgressFromStorage, type TaskProgress as StorageTaskProgress, type AttemptRecord, type StreakData } from "@/lib/storage";
+import { checkAndUnlockAchievements, type AchievementContext } from "@/lib/achievements";
+import { tasks } from "@/lib/tasks";
+import { toast } from "sonner";
 
 export type { TaskProgress as StorageTaskProgress, AttemptRecord, StreakData } from "@/lib/storage";
 
@@ -116,6 +119,13 @@ export const useAppStore = create<AppState>((set, get) => ({
       testCasesCount: state.testCases.length,
     });
     set({ savedProgress: loadProgressFromStorage() });
+
+    // Check and unlock achievements
+    const newlyUnlocked = checkAndUnlockAchievements(buildAchievementContext());
+    for (const _id of newlyUnlocked) {
+      toast.success(`🏆 Достижение разблокировано!`);
+    }
+
     return result;
   },
 
@@ -155,3 +165,34 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ savedProgress: {} });
   },
 }));
+
+/**
+ * Builds an AchievementContext from current localStorage data.
+ * Used by both trainer and exam mode for achievement checking.
+ */
+export function buildAchievementContext(): AchievementContext {
+  const progress = loadProgressFromStorage();
+  const attempts = loadAttempts();
+
+  const bestScores: Record<number, number> = {};
+  for (const [taskIdStr, p] of Object.entries(progress)) {
+    const taskId = Number(taskIdStr);
+    bestScores[taskId] = Math.max(bestScores[taskId] ?? 0, p.score);
+  }
+
+  const perfectScores = Object.values(progress).filter((p) => p.score === 100).length;
+  const completedTasks = Object.keys(progress).length;
+
+  return {
+    completedTasks,
+    totalTasks: tasks.length,
+    bestScores,
+    totalAttempts: attempts.length,
+    perfectScores,
+    attemptHistory: attempts.map((a) => ({
+      taskId: a.taskId,
+      score: a.score,
+      timestamp: a.timestamp,
+    })),
+  };
+}

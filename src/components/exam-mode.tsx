@@ -26,6 +26,8 @@ import { toast } from "sonner";
 import { saveAttempt } from "@/lib/storage";
 import { ResultsPanel } from "./results-panel";
 import { useLocale } from "@/lib/i18n.client";
+import { checkAndUnlockAchievements } from "@/lib/achievements";
+import { buildAchievementContext } from "@/lib/store";
 
 type ExamState = "setup" | "running" | "results";
 
@@ -103,6 +105,12 @@ export function ExamMode() {
     setExamState("results");
     window.dispatchEvent(new Event("achievements-updated"));
     triggerConfetti(results);
+
+    // Check and unlock achievements after exam completion
+    const newlyUnlocked = checkAndUnlockAchievements(buildAchievementContext());
+    for (const _id of newlyUnlocked) {
+      toast.success(`🏆 Достижение разблокировано!`);
+    }
   }, [triggerConfetti]);
 
   useEffect(() => {
@@ -194,6 +202,12 @@ export function ExamMode() {
       timestamp: Date.now(),
       testCasesCount: tcs.length,
     });
+
+    // Check and unlock achievements
+    const newlyUnlocked = checkAndUnlockAchievements(buildAchievementContext());
+    for (const _id of newlyUnlocked) {
+      toast.success(`🏆 Достижение разблокировано!`);
+    }
 
     // Use functional update to avoid stale closure on examResults
     const isLastTask = currentTaskIndex >= examTasksRef.current.length - 1;
