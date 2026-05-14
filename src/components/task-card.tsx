@@ -19,6 +19,10 @@ import {
   Shield,
   Package,
   Phone,
+  GraduationCap,
+  ListOrdered,
+  Search,
+  FileText,
 } from "lucide-react";
 import { useLocale } from "@/lib/i18n.client";
 import { useAppStore } from "@/lib/store";
@@ -38,6 +42,10 @@ const taskIcons: Record<number, React.ReactNode> = {
   11: <Shield className="h-5 w-5" />,
   12: <Package className="h-5 w-5" />,
   13: <Phone className="h-5 w-5" />,
+  14: <GraduationCap className="h-5 w-5" />,
+  15: <ListOrdered className="h-5 w-5" />,
+  16: <Search className="h-5 w-5" />,
+  17: <FileText className="h-5 w-5" />,
 };
 
 const TOPIC_I18N_MAP: Record<string, string | undefined> = {
@@ -49,6 +57,9 @@ const TOPIC_I18N_MAP: Record<string, string | undefined> = {
   "Комбинаторное тестирование": "topic_combinatorial",
   "Проверка форматов": "topic_formats",
   "Таблицы решений": "topic_decision_tables",
+  "Тестирование состояний": "topic_state_transition",
+  "Обработка строк": "topic_string_processing",
+  "Проверка коллекций": "topic_ec",
 };
 
 interface TaskCardProps {
