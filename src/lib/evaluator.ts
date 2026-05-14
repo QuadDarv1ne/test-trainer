@@ -583,6 +583,148 @@ function findCoveredEquivalenceClasses(
         covered.push(ec.id);
       }
     }
+
+    if (taskId === 14) {
+      // calculateGrade
+      const score = Number(inputs[0]);
+      if (ec.id === "t14-ec1" && !error && result && typeof result === "object" && (result as { grade: string }).grade === "A") {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t14-ec2" && !error && result && typeof result === "object" && (result as { grade: string }).grade === "B") {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t14-ec3" && !error && result && typeof result === "object" && (result as { grade: string }).grade === "C") {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t14-ec4" && !error && result && typeof result === "object" && (result as { grade: string }).grade === "D") {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t14-ec5" && !error && result && typeof result === "object" && (result as { grade: string }).grade === "F") {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t14-ec6" && error && typeof score === "number" && score < 0) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t14-ec7" && error && typeof score === "number" && score > 100) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t14-ec8" && error && (typeof inputs[0] !== "number" || (typeof inputs[0] === "number" && isNaN(inputs[0] as number)))) {
+        covered.push(ec.id);
+      }
+    }
+
+    if (taskId === 15) {
+      // queueOperation
+      const op = inputs[1];
+      const item = inputs[2];
+      const queueLen = Array.isArray(inputs[0]) ? (inputs[0] as unknown[]).length : 0;
+      if (ec.id === "t15-ec1" && !error && op === "enqueue" && item && queueLen > 0) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t15-ec2" && !error && op === "enqueue" && item && queueLen === 0) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t15-ec3" && !error && op === "dequeue" && queueLen > 0) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t15-ec4" && error && op === "dequeue" && queueLen === 0) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t15-ec5" && !error && op === "peek" && queueLen > 0) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t15-ec6" && error && op === "peek" && queueLen === 0) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t15-ec7" && !error && op === "isEmpty") {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t15-ec8" && !error && op === "size") {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t15-ec9" && error && op !== "enqueue" && op !== "dequeue" && op !== "peek" && op !== "isEmpty" && op !== "size") {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t15-ec10" && error && op === "enqueue" && !item) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t15-ec11" && error && op === "enqueue" && queueLen >= 100) {
+        covered.push(ec.id);
+      }
+    }
+
+    if (taskId === 16) {
+      // binarySearch
+      if (!Array.isArray(inputs[0])) {
+        if (ec.id === "t16-ec6" && error) covered.push(ec.id);
+      } else {
+        const arr = inputs[0] as number[];
+        const target = inputs[1];
+        const isSorted = arr.every((v, i) => i === 0 || arr[i - 1] <= v);
+        if (ec.id === "t16-ec1" && !error && typeof result === "number" && result >= 0) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "t16-ec2" && !error && result === -1 && isSorted) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "t16-ec3" && !error && arr.length === 0 && result === -1) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "t16-ec4" && !error && arr.length === 1 && result === 0) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "t16-ec5" && !error && arr.length === 1 && result === -1) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "t16-ec6" && error && !isSorted) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "t16-ec7" && !error && result === -1 && isSorted && typeof target === "number" && target < arr[0]) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "t16-ec8" && !error && result === -1 && isSorted && typeof target === "number" && target > arr[arr.length - 1]) {
+          covered.push(ec.id);
+        }
+        if (ec.id === "t16-ec9" && !error && isSorted && new Set(arr).size < arr.length) {
+          covered.push(ec.id);
+        }
+      }
+    }
+
+    if (taskId === 17) {
+      // analyzeText
+      const text = inputs[0];
+      if (ec.id === "t17-ec1" && !error && typeof text === "string" && text.includes(".") && text.trim().split(/\s+/).length > 2) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t17-ec2" && !error && text === "") {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t17-ec3" && !error && typeof text === "string" && text.trim().length === 0) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t17-ec4" && !error && typeof text === "string" && !/[.!?]/.test(text) && text.trim().split(/\s+/).length === 1) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t17-ec5" && !error && typeof text === "string" && text.trim().split(/\s+/).length > 0 && /[.!?]/.test(text)) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t17-ec6" && !error && typeof text === "string" && /[.!?]/.test(text) && (text.match(/[.!?]/g) || []).length >= 2) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t17-ec7" && !error && typeof text === "string" && !/[.!?]/.test(text) && text.trim().split(/\s+/).length > 1) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t17-ec8" && !error && typeof text === "string" && /\s{2,}/.test(text)) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t17-ec9" && error && typeof text === "string" && text.length > 10000) {
+        covered.push(ec.id);
+      }
+      if (ec.id === "t17-ec10" && error && typeof text !== "string") {
+        covered.push(ec.id);
+      }
+    }
   }
 
   return [...new Set(covered)];

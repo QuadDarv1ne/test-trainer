@@ -193,20 +193,18 @@ export function ExamMode() {
     });
 
     // Use functional update to avoid stale closure on examResults
+    const isLastTask = currentTaskIndex >= examTasksRef.current.length - 1;
     setExamResults((prev) => {
       // Prevent double-submit of the same task
       if (prev.find((r) => r.task.id === task.id)) return prev;
-      const updated = [...prev, result];
+      return [...prev, result];
+    });
 
-      if (currentTaskIndex < examTasksRef.current.length - 1) {
-        return updated;
-      }
-      // Last task — transition to results
+    if (isLastTask) {
       setExamState("results");
       window.dispatchEvent(new Event("achievements-updated"));
-      triggerConfetti(updated);
-      return updated;
-    });
+      triggerConfetti([...examResults, result]);
+    }
 
     if (currentTaskIndex < examTasksRef.current.length - 1) {
       const nextTask = examTasksRef.current[currentTaskIndex + 1];
@@ -422,9 +420,11 @@ export function ExamMode() {
                   }
                   value={examInputs[idx] ?? ""}
                   onChange={(e) => {
-                    const newInputs = [...examInputs];
-                    newInputs[idx] = e.target.value;
-                    setExamInputs(newInputs);
+                    setExamInputs((prev) => {
+                      const newInputs = [...prev];
+                      newInputs[idx] = e.target.value;
+                      return newInputs;
+                    });
                   }}
                   className="h-9 text-sm"
                 />
