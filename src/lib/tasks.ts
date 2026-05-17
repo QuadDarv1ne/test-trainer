@@ -222,6 +222,86 @@ function validatePhone(phone: string): { valid: boolean; reason?: string } {
   return { valid: true };
 }
 
+function calculateGrade(score: number): { grade: string; gpa: number } {
+  if (typeof score !== "number" || isNaN(score))
+    throw new Error("Балл должен быть числом");
+  if (score < 0) throw new Error("Балл не может быть отрицательным");
+  if (score > 100) throw new Error("Балл не может превышать 100");
+  if (score >= 90) return { grade: "A", gpa: 4.0 };
+  if (score >= 80) return { grade: "B", gpa: 3.0 };
+  if (score >= 70) return { grade: "C", gpa: 2.0 };
+  if (score >= 60) return { grade: "D", gpa: 1.0 };
+  return { grade: "F", gpa: 0.0 };
+}
+
+function queueOperation(
+  queue: string[],
+  operation: string,
+  item?: string
+): { queue: string[]; result?: string } {
+  if (!Array.isArray(queue)) throw new Error("Очередь должна быть массивом");
+  if (typeof operation !== "string") throw new Error("Операция должна быть строкой");
+  if (queue.length > 100) throw new Error("Очередь слишком большая (макс. 100 элементов)");
+  const q = [...queue];
+  switch (operation) {
+    case "enqueue":
+      if (item === undefined) throw new Error("Для enqueue нужен элемент");
+      if (q.length >= 100) throw new Error("Очередь заполнена");
+      q.push(item);
+      return { queue: q };
+    case "dequeue":
+      if (q.length === 0) throw new Error("Очередь пуста");
+      const dequeued = q.shift();
+      return { queue: q, result: dequeued };
+    case "peek":
+      if (q.length === 0) throw new Error("Очередь пуста");
+      return { queue: q, result: q[0] };
+    case "isEmpty":
+      return { queue: q, result: String(q.length === 0) };
+    case "size":
+      return { queue: q, result: String(q.length) };
+    default:
+      throw new Error(`Неизвестная операция: ${operation}`);
+  }
+}
+
+function binarySearch(arr: number[], target: number): number {
+  if (!Array.isArray(arr)) throw new Error("Аргумент должен быть массивом");
+  if (typeof target !== "number" || isNaN(target))
+    throw new Error("Цель должна быть числом");
+  for (const item of arr) {
+    if (typeof item !== "number" || isNaN(item))
+      throw new Error("Все элементы должны быть числами");
+  }
+  for (let i = 1; i < arr.length; i++) {
+    if (arr[i] < arr[i - 1]) throw new Error("Массив должен быть отсортирован");
+  }
+  if (arr.length === 0) return -1;
+  if (arr.length > 10000) throw new Error("Массив слишком большой (макс. 10000 элементов)");
+  let left = 0;
+  let right = arr.length - 1;
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    if (arr[mid] === target) return mid;
+    if (arr[mid] < target) left = mid + 1;
+    else right = mid - 1;
+  }
+  return -1;
+}
+
+function analyzeText(text: string): { words: number; sentences: number; avgWordLength: number } {
+  if (typeof text !== "string") throw new Error("Текст должен быть строкой");
+  if (text.length === 0) return { words: 0, sentences: 0, avgWordLength: 0 };
+  if (text.length > 10000) throw new Error("Текст слишком длинный (макс. 10000 символов)");
+  const trimmed = text.trim();
+  if (trimmed.length === 0) return { words: 0, sentences: 0, avgWordLength: 0 };
+  const words = trimmed.split(/\s+/).filter((w) => w.length > 0);
+  const sentences = trimmed.split(/[.!?]+/).filter((s) => s.trim().length > 0);
+  const totalWordLength = words.reduce((sum, w) => sum + w.length, 0);
+  const avgWordLength = words.length > 0 ? Math.round((totalWordLength / words.length) * 100) / 100 : 0;
+  return { words: words.length, sentences: sentences.length, avgWordLength };
+}
+
 // Map of reference functions
 export const referenceFunctions: Record<
   number,
