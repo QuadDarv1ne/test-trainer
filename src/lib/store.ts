@@ -3,7 +3,7 @@ import type { Task } from "@/lib/tasks";
 import type { TestCase, EvaluationResult } from "@/lib/evaluator";
 import { evaluateTestCases } from "@/lib/evaluator";
 import { saveCurrentSession, loadCurrentSession, saveProgress as saveProgressToStorage, loadProgress as loadProgressFromStorage, saveAttempt, loadAttempts, getTaskHistory, loadStreak, saveStreak, clearAllProgress as clearAllProgressFromStorage, type TaskProgress as StorageTaskProgress, type AttemptRecord, type StreakData } from "@/lib/storage";
-import { checkAndUnlockAchievements, type AchievementContext } from "@/lib/achievements";
+import { checkAndUnlockAchievements, achievements, type AchievementContext } from "@/lib/achievements";
 import { tasks } from "@/lib/tasks";
 import { toast } from "sonner";
 
@@ -122,8 +122,9 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     // Check and unlock achievements
     const newlyUnlocked = checkAndUnlockAchievements(buildAchievementContext());
-    for (const _id of newlyUnlocked) {
-      toast.success(`🏆 Достижение разблокировано!`);
+    for (const id of newlyUnlocked) {
+      const ach = achievements.find((a) => a.id === id);
+      toast.success(`🏆 ${ach?.name ?? "Достижение"} разблокировано!`);
     }
 
     return result;

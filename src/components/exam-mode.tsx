@@ -26,7 +26,7 @@ import { toast } from "sonner";
 import { saveAttempt } from "@/lib/storage";
 import { ResultsPanel } from "./results-panel";
 import { useLocale } from "@/lib/i18n.client";
-import { checkAndUnlockAchievements } from "@/lib/achievements";
+import { checkAndUnlockAchievements, achievements } from "@/lib/achievements";
 import { buildAchievementContext } from "@/lib/store";
 
 type ExamState = "setup" | "running" | "results";
@@ -107,8 +107,9 @@ export function ExamMode() {
 
     // Check and unlock achievements after exam completion
     const newlyUnlocked = checkAndUnlockAchievements(buildAchievementContext());
-    if (newlyUnlocked.length > 0) {
-      toast.success(`🏆 ${t("achievements_unlocked_toast")}`);
+    for (const id of newlyUnlocked) {
+      const ach = achievements.find((a) => a.id === id);
+      toast.success(`🏆 ${ach?.name ?? "Достижение"} разблокировано!`);
     }
   }, [triggerConfetti]);
 
@@ -204,8 +205,9 @@ export function ExamMode() {
 
     // Check and unlock achievements
     const newlyUnlocked = checkAndUnlockAchievements(buildAchievementContext());
-    if (newlyUnlocked.length > 0) {
-      toast.success(`🏆 ${t("achievements_unlocked_toast")}`);
+    for (const id of newlyUnlocked) {
+      const ach = achievements.find((a) => a.id === id);
+      toast.success(`🏆 ${ach?.name ?? "Достижение"} разблокировано!`);
     }
 
     // Use functional update to avoid stale closure on examResults
