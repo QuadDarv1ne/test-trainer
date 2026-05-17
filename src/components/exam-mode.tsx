@@ -103,13 +103,12 @@ export function ExamMode() {
     }
     setExamResults(results);
     setExamState("results");
-    window.dispatchEvent(new Event("achievements-updated"));
     triggerConfetti(results);
 
     // Check and unlock achievements after exam completion
     const newlyUnlocked = checkAndUnlockAchievements(buildAchievementContext());
-    for (const _id of newlyUnlocked) {
-      toast.success(`🏆 Достижение разблокировано!`);
+    if (newlyUnlocked.length > 0) {
+      toast.success(`🏆 ${t("achievements_unlocked_toast")}`);
     }
   }, [triggerConfetti]);
 
@@ -205,8 +204,8 @@ export function ExamMode() {
 
     // Check and unlock achievements
     const newlyUnlocked = checkAndUnlockAchievements(buildAchievementContext());
-    for (const _id of newlyUnlocked) {
-      toast.success(`🏆 Достижение разблокировано!`);
+    if (newlyUnlocked.length > 0) {
+      toast.success(`🏆 ${t("achievements_unlocked_toast")}`);
     }
 
     // Use functional update to avoid stale closure on examResults

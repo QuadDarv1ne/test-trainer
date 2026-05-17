@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "mode": "yolo",
+    "allow": [
+      "Bash(*)",
+      "Read(*)",
+      "Write(*)",
+      "Edit(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "Agent(*)",
+      "TodoWrite(*)",
+      "Skill(*)",
+      "NotebookEdit(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "ImageGen(*)",
+      "AskUserQuestion(*)"
+    ]
+  },
+  "model": {
+    "name": "auto"
+  },
+  "editor": {
+    "formatOnSave": true,
+    "defaultFormatter": "prettier"
+  },
+  "chat": {
+    "welcomeMessage": false
+  },
+  "context": {
+    "fileLimit": 100,
+    "maxFileSize": "500kb"
+  }
+}

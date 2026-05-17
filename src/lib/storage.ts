@@ -46,7 +46,7 @@ export function saveProgress(
       localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
     }
   } catch (e) {
-    if (e instanceof DOMException && e.name === "QuotaExceededError") {
+    if (e instanceof Error && e.name === "QuotaExceededError") {
       toast.error("Хранилище браузера заполнено. Очистите данные сайта.");
     }
   }
@@ -75,7 +75,7 @@ export function saveCurrentSession(
   try {
     localStorage.setItem(SESSION_PREFIX + taskId, JSON.stringify(testCases));
   } catch (e) {
-    if (e instanceof DOMException && e.name === "QuotaExceededError") {
+    if (e instanceof Error && e.name === "QuotaExceededError") {
       toast.error("Хранилище браузера заполнено. Очистите данные сайта.");
     }
   }
@@ -106,7 +106,7 @@ export function saveAttempt(record: AttemptRecord): void {
     // Обновляем streak
     updateStreak(record.timestamp);
   } catch (e) {
-    if (e instanceof DOMException && e.name === "QuotaExceededError") {
+    if (e instanceof Error && e.name === "QuotaExceededError") {
       toast.error("Хранилище браузера заполнено. Очистите данные сайта.");
     }
   }
@@ -181,7 +181,7 @@ export function saveStreak(streak: StreakData): void {
   try {
     localStorage.setItem(STREAK_KEY, JSON.stringify(streak));
   } catch (e) {
-    if (e instanceof DOMException && e.name === "QuotaExceededError") {
+    if (e instanceof Error && e.name === "QuotaExceededError") {
       toast.error("Хранилище браузера заполнено. Очистите данные сайта.");
     }
   }

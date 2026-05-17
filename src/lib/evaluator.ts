@@ -56,13 +56,10 @@ function parseInputValue(raw: string): unknown {
   if (trimmed === "да" || trimmed === "верно") return true;
   if (trimmed === "нет" || trimmed === "неверно") return false;
 
-  // Try parsing as number — improved to handle decimals and negatives better
+  // Try parsing as number — allow leading zeros, decimals, negatives
   const num = Number(trimmed);
   if (trimmed !== "" && !isNaN(num)) {
-    // Check that it looks like a number (allow negatives, decimals)
-    if (/^-?\d+(\.\d+)?$/.test(trimmed)) {
-      return num;
-    }
+    return num;
   }
 
   // Try parsing as JSON (for objects, arrays)

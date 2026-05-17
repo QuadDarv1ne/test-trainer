@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git push origin main:main --force-with-lease && git branch -m main main-synced 2>/dev/null; git checkout main && git reset --hard master && git push origin main --force-with-lease)",
+      "Bash(git branch:*)",
+      "Bash(git checkout main && git merge master && git push origin main && echo \"---PUSHED---\" && git push origin --delete master && echo \"---DELETED REMOTE MASTER---\" && git branch -D master && echo \"---DONE---\")",
+      "Bash(gh api repos/QuadDarv1ne/test-trainer -X PATCH -F default_branch=main && echo \"---CHANGED DEFAULT---\" && git push origin --delete master && echo \"---DELETED REMOTE MASTER---\" && git branch -D master && echo \"---DONE---\")",
+      "Bash(cd M:/GitHub/test-trainer && rm -f tsconfig.tsbuildinfo && ./node_modules/.bin/tsc --noEmit 2>&1 | head -80)"
+    ]
+  }
+}

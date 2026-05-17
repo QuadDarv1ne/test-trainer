@@ -126,7 +126,7 @@ export function saveUnlockedAchievements(ids: string[]): void {
   try {
     localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(ids));
   } catch (e) {
-    if (e instanceof DOMException && e.name === "QuotaExceededError") {
+    if (e instanceof Error && e.name === "QuotaExceededError") {
       toast.error("Хранилище браузера заполнено. Очистите данные сайта.");
     }
   }
