@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,13 +33,18 @@ export function TaskWorkspace({ task, testCasesCount = 0 }: TaskWorkspaceProps) 
   const allHints = useMemo(() => [
     ...task.equivalenceClasses.map((ec) => ({
       type: "ec" as const,
-      text: `${t("trainer_hint")}: ${ec.name} — ${ec.description}. ${t("form_placeholder_number").split(":")[1] || ""} ${JSON.stringify(ec.exampleValues[0])}`,
+      text: `${ec.name} — ${ec.description}. Пример: ${JSON.stringify(ec.exampleValues[0])}`,
     })),
     ...task.boundaryValues.map((bv) => ({
       type: "bv" as const,
-      text: `${t("trainer_hint")}: ${Array.isArray(bv.value) ? `[${bv.value.join(", ")}]` : bv.value} — ${bv.description}`,
+      text: `${Array.isArray(bv.value) ? `[${bv.value.join(", ")}]` : bv.value} — ${bv.description}`,
     })),
-  ], [task, t]);
+  ], [task]);
+
+  // Reset hint index when switching tasks
+  useEffect(() => {
+    setHintIndex(0);
+  }, [task.id]);
 
   const showHint = testCasesCount > 0 && hintIndex < allHints.length;
   return (
